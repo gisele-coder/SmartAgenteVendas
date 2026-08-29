@@ -5,6 +5,23 @@
 
 ---
 
+## ⏰ Ao retornar (30/08) — executar nesta ordem
+
+1. **PARTE 8 (fechar):**
+   - a. Discord webhook (2 min) → [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md) passo 1
+   - b. Chatflow no Flowise Cloud (10 min) → passos 2.1–2.6 do mesmo doc
+   - c. Exportar o chatflow como `docs/lowcode/flowise-flow.json`
+   - d. Passar para o assistente: `FLOWISE_URL`, `FLOWISE_API_KEY`, `FLOWISE_CHATFLOW_ID` → `.env` + **demo end-to-end real** (injection → Discord) → evidência arquivada
+   - e. `fase-8-lowcode.md` + Parte 8 ✅ no plano-execucao + critério 14 + Kanban
+2. **PARTE 9 (finalização, entregar até 15h):**
+   - a. Prompts consolidados + refinamento (critério 15)
+   - b. README final (checklist 5.2) + link do vídeo
+   - c. Gravar vídeo ≤12min (roteiro 5.5) → YouTube não listado → AVA
+   - d. Merge `develop` → `main` + convidar professor + submeter no AVA
+3. **NÃO ESQUECER:** revogar a API key OpenCode **após** a entrega (exposta no chat) · secret `LLM_API_KEY` no Actions (opcional) · Kanban em dia
+
+---
+
 ## 📍 Onde paramos (29/08 — fim da Parte 8, lado da aplicação)
 
 - ✅ **Parte 8 (app-side) mergeada** — `0dc052c` · **47 passed** · Ruff limpo
