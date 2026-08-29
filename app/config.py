@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     llm_model: str = "hy3-free"
     llm_temperature: float = 0.2
-    llm_max_tokens: int = 800
+    llm_max_tokens: int = 3000
     llm_timeout_s: int = 30
     llm_max_retries: int = 2
 
