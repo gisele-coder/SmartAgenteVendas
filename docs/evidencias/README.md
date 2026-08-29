@@ -35,6 +35,15 @@ Esta pasta concentra **artefatos comprobatórios de execução** do projeto, con
 
 ---
 
+## Índice de Evidências Arquivadas
+
+| Data | Evidência | Fase | Arquivo |
+|---|---|---|---|
+| 29/08 | Execução real E2E do grafo (`e2e-real-001`) — cliente 100011, padrão climatização | 2 | [`execucoes/e2e-real-001-fase-2.md`](./execucoes/e2e-real-001-fase-2.md) |
+| 29/08 | Smoke test HTTP da API (`668b104164e6`) — uvicorn + curl, LLM real | 3 | [`execucoes/api-668b104164e6-fase-3.md`](./execucoes/api-668b104164e6-fase-3.md) |
+
+---
+
 ## Quando Popular
 
 Esta pasta deve começar a ser preenchida assim que:
