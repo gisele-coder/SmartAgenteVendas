@@ -17,5 +17,11 @@ class Settings(BaseSettings):
     log_path: str = "logs/execution.log"
     tool_delay_ms: int = 0
 
+    flowise_alerts_enabled: bool = False
+    flowise_url: str = ""
+    flowise_api_key: str = ""
+    flowise_chatflow_id: str = ""
+    flowise_timeout_s: int = 5
+
 
 settings = Settings()

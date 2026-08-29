@@ -15,6 +15,7 @@ from app.graph.nodes import (
     validate_recommendations,
 )
 from app.graph.state import RecommendationState
+from app.integrations.flowise import notify_flowise
 from app.observability.metrics import record_run
 from app.security.audit import write_audit
 
@@ -87,4 +88,22 @@ def run_recommendation(request: dict, llm=None) -> dict:
         total_ms,
         tool_ms,
     )
+    _emit_lowcode_event(output)
     return output
+
+
+def _emit_lowcode_event(output: dict) -> None:
+    request_id = output.get("request_id", "n/a")
+    if output.get("status") == "blocked":
+        reason = output.get("reason", "")
+        risk = "high" if "injection" in reason.lower() else "medium"
+        notify_flowise(request_id, "security_blocked", output.get("customer_id"), reason, risk)
+    elif output.get("fallback_used"):
+        errors = "; ".join(output.get("errors", []))[:200]
+        notify_flowise(
+            request_id,
+            "recommendation_generation_failed",
+            output.get("customer_id"),
+            errors,
+            "medium",
+        )
