@@ -36,3 +36,18 @@ def load_orders() -> pd.DataFrame:
 
     df.columns = [str(c).lower() for c in df.columns]
     return df
+
+
+@lru_cache(maxsize=1)
+def get_catalog() -> dict[int, dict]:
+    df = load_orders()
+    subset = df[["cod_prod", "produto", "setor", "categoria", "tipo"]].drop_duplicates("cod_prod")
+    return {
+        int(row.cod_prod): {
+            "produto": str(row.produto),
+            "setor": str(row.setor),
+            "categoria": str(row.categoria),
+            "tipo": str(row.tipo),
+        }
+        for row in subset.itertuples(index=False)
+    }

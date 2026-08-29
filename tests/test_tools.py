@@ -48,6 +48,7 @@ def test_input_invalido_rejeitado(invalid):
 def test_coocorrencia_exclui_produtos_ja_comprados():
     own = {i.cod_prod for i in orders_tool.get_customer_orders(KNOWN_CLIENT).items}
     result = similar_tool.find_similar_products(KNOWN_CLIENT, limit=10)
+    assert len(result) >= 1
     assert all(isinstance(s, SimilarProduct) for s in result)
     assert all(s.cod_prod not in own for s in result)
     confidences = [s.confidence for s in result]

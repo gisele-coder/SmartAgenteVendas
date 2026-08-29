@@ -11,22 +11,22 @@ def find_similar_products(customer_id: int, limit: int = DEFAULT_LIMIT) -> list[
         raise ValueError("limit deve ser um inteiro positivo")
 
     df = load_orders()
-    customer_orders = set(df.loc[df["cliente"] == customer_id, "pedido"].unique())
-    if not customer_orders:
+    customer_products = set(df.loc[df["cliente"] == customer_id, "cod_prod"].unique())
+    if not customer_products:
         return []
 
-    customer_products = set(df.loc[df["cliente"] == customer_id, "cod_prod"].unique())
-    co = df[df["pedido"].isin(customer_orders) & ~df["cod_prod"].isin(customer_products)]
+    orders_with_owned = df.loc[df["cod_prod"].isin(customer_products), "pedido"].unique()
+    co = df[df["pedido"].isin(orders_with_owned) & ~df["cod_prod"].isin(customer_products)]
     counts = co.groupby(["cod_prod", "produto"]).size().reset_index(name="cooccurrence")
-    counts = counts.sort_values("cooccurrence", ascending=False).head(limit)
+    counts = counts.sort_values(["cooccurrence", "produto"], ascending=[False, True]).head(limit)
 
-    total_orders = max(len(customer_orders), 1)
+    base = max(len(orders_with_owned), 1)
     return [
         SimilarProduct(
             cod_prod=int(row["cod_prod"]),
             produto=str(row["produto"]),
             cooccurrence=int(row["cooccurrence"]),
-            confidence=round(min(int(row["cooccurrence"]) / total_orders, 1.0), 2),
+            confidence=round(min(int(row["cooccurrence"]) / base, 1.0), 2),
         )
         for _, row in counts.iterrows()
     ]
