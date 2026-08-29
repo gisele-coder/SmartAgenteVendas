@@ -43,6 +43,9 @@ Esta pasta concentra **artefatos comprobatórios de execução** do projeto, con
 | 29/08 | Smoke test HTTP da API (`668b104164e6`) — uvicorn + curl, LLM real | 3 | [`execucoes/api-668b104164e6-fase-3.md`](./execucoes/api-668b104164e6-fase-3.md) |
 | 29/08 | Cenários adversariais (injection + ação destrutiva) bloqueados via HTTP com audit correlacionado | 4 | [`seguranca/adversarial-fase-4.md`](./seguranca/adversarial-fase-4.md) |
 | 29/08 | 3 execuções com logs JSON + métricas + audit correlacionados (`/metrics` capturado) | 5 | [`execucoes/observabilidade-fase-5.md`](./execucoes/observabilidade-fase-5.md) |
+| 29/08 | Pipeline 3/3 etapas com análise da IA de cada estágio | 7 | [`pipeline/pipeline-local-2026-08-29.md`](./pipeline/pipeline-local-2026-08-29.md) |
+| 29/08 | Anomalia linear de latência da tool (detecção run 5, causa isolada) | 7 | [`anomalias/anomalia-tool-latency-2026-08-29.md`](./anomalias/anomalia-tool-latency-2026-08-29.md) |
+| 29/08 | Estimativa de tendência (regressão) e risco de falha (SLA) | 7 | [`metricas/tendencia-risco-2026-08-29.md`](./metricas/tendencia-risco-2026-08-29.md) |
 
 ---
 
