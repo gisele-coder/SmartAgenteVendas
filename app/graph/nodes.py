@@ -5,6 +5,7 @@ from langchain_core.runnables import RunnableConfig
 
 from app.graph.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.llm import get_llm
+from app.observability.logging_config import log_flow
 from app.security.guard import analyze_query
 from app.tools.loader import get_catalog
 from app.tools.orders import customer_exists, get_customer_orders
@@ -21,6 +22,8 @@ def _audit(state: dict, event: str, **extra) -> dict:
 
 
 def validate_input(state: dict) -> dict:
+    t0 = time.perf_counter()
+    request_id = state.get("request_id", "n/a")
     customer_id = state.get("customer_id")
     previous = [
         {"cod_prod": rec["cod_prod"], "product": rec["product"]}
@@ -29,10 +32,13 @@ def validate_input(state: dict) -> dict:
     errors = list(state.get("errors", []))
     if not isinstance(customer_id, int) or isinstance(customer_id, bool) or customer_id <= 0:
         errors.append("customer_id inválido")
+        log_flow(request_id, "validate_input", _lat(t0), validated=False, reason="id inválido")
         return {"validated": False, "errors": errors}
     if not customer_exists(customer_id):
         errors.append(f"cliente {customer_id} inexistente")
+        log_flow(request_id, "validate_input", _lat(t0), validated=False, reason="inexistente")
         return {"validated": False, "errors": errors}
+    log_flow(request_id, "validate_input", _lat(t0), validated=True, has_memory=bool(previous))
     return {
         "validated": True,
         "errors": [],
@@ -44,6 +50,8 @@ def validate_input(state: dict) -> dict:
 
 
 def security_check(state: dict) -> dict:
+    t0 = time.perf_counter()
+    request_id = state.get("request_id", "n/a")
     analysis = analyze_query(state.get("query") or "")
     if not analysis["safe"]:
         kind = analysis["kind"]
@@ -52,6 +60,7 @@ def security_check(state: dict) -> dict:
             if kind == "injection"
             else "ação destrutiva/não autorizada (limite de autonomia)"
         )
+        log_flow(request_id, "security_check", _lat(t0), blocked=True, kind=kind)
         return {
             "security_status": "blocked",
             "block_reason": reason,
@@ -59,13 +68,24 @@ def security_check(state: dict) -> dict:
                 _audit(state, "security_blocked", kind=kind, patterns=analysis["patterns"][:3])
             ],
         }
+    log_flow(request_id, "security_check", _lat(t0), blocked=False)
     return {"security_status": "ok", "audit_events": [_audit(state, "security_ok")]}
 
 
 def get_purchase_history(state: dict) -> dict:
+    t0 = time.perf_counter()
     result = get_customer_orders(state["customer_id"])
+    latency = _lat(t0)
+    log_flow(
+        state.get("request_id", "n/a"),
+        "get_purchase_history",
+        latency,
+        items=len(result.items),
+        orders=result.orders_count,
+    )
     return {
         "purchase_history": [item.model_dump() for item in result.items],
+        "history_ms": latency,
         "audit_events": [
             _audit(state, "history_retrieved", items=len(result.items), orders=result.orders_count)
         ],
@@ -73,9 +93,13 @@ def get_purchase_history(state: dict) -> dict:
 
 
 def find_similar_products_node(state: dict) -> dict:
+    t0 = time.perf_counter()
     result = find_similar_products(state["customer_id"], limit=5)
+    latency = _lat(t0)
+    log_flow(state.get("request_id", "n/a"), "find_similar_products", latency, count=len(result))
     return {
         "similar_products": [item.model_dump() for item in result],
+        "similar_ms": latency,
         "audit_events": [_audit(state, "similar_retrieved", count=len(result))],
     }
 
@@ -104,6 +128,8 @@ def parse_recommendations(text: str, catalog: dict) -> list[dict]:
 
 
 def generate_recommendations(state: dict, config: RunnableConfig | None = None) -> dict:
+    t0 = time.perf_counter()
+    request_id = state.get("request_id", "n/a")
     history = state.get("purchase_history", [])
     if not history:
         return {"llm_recommendations": [], "fallback_used": True}
@@ -118,6 +144,7 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
     try:
         response = llm.invoke([("system", SYSTEM_PROMPT), ("human", prompt)])
         parsed = parse_recommendations(response.content, catalog)
+        log_flow(request_id, "generate_recommendations", _lat(t0), source="llm", count=len(parsed))
         return {
             "llm_recommendations": parsed,
             "fallback_used": False,
@@ -127,6 +154,13 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
             ],
         }
     except Exception as exc:  # noqa: BLE001
+        log_flow(
+            request_id,
+            "generate_recommendations",
+            _lat(t0),
+            source="fallback",
+            error=str(exc)[:80],
+        )
         return {
             "llm_recommendations": [],
             "fallback_used": True,
@@ -136,6 +170,7 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
 
 
 def validate_recommendations(state: dict) -> dict:
+    t0 = time.perf_counter()
     catalog = get_catalog()
     valid = []
     for rec in state.get("llm_recommendations", []):
@@ -155,6 +190,7 @@ def validate_recommendations(state: dict) -> dict:
             for item in state.get("similar_products", [])[:5]
         ]
 
+    log_flow(state.get("request_id", "n/a"), "validate_recommendations", _lat(t0), count=len(valid))
     return {
         "recommendations": valid,
         "audit_events": [_audit(state, "recommendations_validated", count=len(valid))],
@@ -162,6 +198,8 @@ def validate_recommendations(state: dict) -> dict:
 
 
 def block_request(state: dict) -> dict:
+    t0 = time.perf_counter()
+    log_flow(state.get("request_id", "n/a"), "block_request", _lat(t0))
     return {
         "audit_events": [
             _audit(state, "request_blocked", reason=state.get("block_reason", ""))
@@ -192,6 +230,8 @@ def _build_profile(history: list[dict]) -> dict:
 
 
 def finalize_response(state: dict) -> dict:
+    t0 = time.perf_counter()
+    request_id = state.get("request_id", "n/a")
     if state.get("security_status") == "blocked":
         status = "blocked"
     elif not state.get("validated", False):
@@ -207,7 +247,7 @@ def finalize_response(state: dict) -> dict:
         fallback_used = False
 
     output = {
-        "request_id": state.get("request_id", "n/a"),
+        "request_id": request_id,
         "customer_id": state.get("customer_id"),
         "status": status,
         "customer_profile": _build_profile(state.get("purchase_history", [])),
@@ -218,7 +258,12 @@ def finalize_response(state: dict) -> dict:
     }
     if status == "blocked":
         output["reason"] = state.get("block_reason", "")
+    log_flow(request_id, "finalize_response", _lat(t0), status=status)
     return {
         "output": output,
         "audit_events": [_audit(state, "response_completed", status=status)],
     }
+
+
+def _lat(t0: float) -> float:
+    return round((time.perf_counter() - t0) * 1000, 1)

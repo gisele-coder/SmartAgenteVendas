@@ -1,3 +1,4 @@
+import time
 from functools import lru_cache
 
 from langgraph.checkpoint.memory import MemorySaver
@@ -14,6 +15,7 @@ from app.graph.nodes import (
     validate_recommendations,
 )
 from app.graph.state import RecommendationState
+from app.observability.metrics import record_run
 from app.security.audit import write_audit
 
 
@@ -61,7 +63,9 @@ def run_recommendation(request: dict, llm=None) -> dict:
     configurable: dict = {"thread_id": f"customer-{request.get('customer_id')}"}
     if llm is not None:
         configurable["llm"] = llm
+    t0 = time.perf_counter()
     result = build_graph().invoke(request, config={"configurable": configurable})
+    total_ms = round((time.perf_counter() - t0) * 1000, 1)
     output = result["output"]
     request_id = output.get("request_id", "n/a")
     events = [
@@ -70,4 +74,12 @@ def run_recommendation(request: dict, llm=None) -> dict:
         if event.get("request_id") == request_id
     ]
     write_audit(request_id, events)
+    tool_ms = round(result.get("history_ms", 0.0) + result.get("similar_ms", 0.0), 1)
+    record_run(
+        output.get("status", "error"),
+        bool(output.get("fallback_used")),
+        len(output.get("recommendations", [])),
+        total_ms,
+        tool_ms,
+    )
     return output

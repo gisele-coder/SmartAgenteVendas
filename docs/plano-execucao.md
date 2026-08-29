@@ -39,7 +39,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 2 | **Núcleo LangGraph** | State tipado, 8 nodes (`validate_input`, `security_check`, `block_request`, `get_purchase_history` ∥ `find_similar_products`, `generate_recommendations`, `validate_recommendations`, `finalize_response`), edges condicionais, paralelização, condição de parada, separação LLM × regras | 6, 7 | ✅ **Concluída** | pytest 17 passed · E2E real `hy3-free` · branch `feature/langgraph-core` | 3 bugs corrigidos (coocorrência market-basket, injeção de config, max_tokens de reasoning) → Refinamento 1 documentado; DAG sem ciclos = parada estrutural |
 | 3 | **API + Memória** | `POST /recomendacoes`, `request_id` por execução, `MemorySaver` (checkpointer), perfil do cliente no State | 5, 9 | ✅ **Concluída** | pytest 24 passed · smoke real uvicorn+curl (`api-668b104164e6`) · branch `feature/api-memoria` | Memória por thread de cliente (`previous_recommendations`); DI do LLM para testes sem rede |
 | 4 | **Segurança** | Módulo `app/security/` (guard: injection + ações destrutivas com normalização; audit JSONL), bloqueio pré-LLM, agente somente-leitura, cenário adversarial real | 10 | ✅ **Concluída** | pytest 34 passed · evidência `adversarial-fase-4.md` (2 ataques bloqueados via HTTP) · branch `feature/governanca` | Bug de correlação do audit descoberto pela evidência → Refinamento 2 |
-| 5 | **Observabilidade** | Logs JSON por node correlacionados por `request_id`, métricas (latências, bloqueios, erros), timeout/retry na tool e LLM | 11 | ⬜ Pendente | — | 2+ sinais correlacionados: logs estruturados + audit/métricas |
+| 5 | **Observabilidade** | Logs JSON por node (`logs/execution.log`), métricas agregadas + `GET /metrics`, audit JSONL correlacionado por `request_id`, timeout/retry no LLM, delay simulável na tool | 11 | ✅ **Concluída** | pytest 41 passed · evidência `observabilidade-fase-5.md` (3 execuções, 3 sinais correlacionados) · branch `feature/observabilidade` | Bug de chaves não declaradas no State corrigido; LLM confirmado como gargalo (98,8%) |
 | 6 | **QA** | Testes unitários + integração (TestClient→grafo→tool→xlsx), teste prioritário por risco, code review com IA de PR real | 12 | ⬜ Pendente | — | Prioridade 1: acesso a dados de outro cliente (impacto alto) |
 | 7 | **DevOps** | CI GitHub Actions (ruff→pytest→build), anomalia simulada (timeout tool), IA analisa logs de ≥2 etapas, estimativa de tendência/risco | 13 | ⬜ Pendente | — | Key LLM no CI via GitHub Secret; testes pulam sem key |
 | 8 | **N8N Low-code** | Webhook `security_blocked`/`recommendation_failed` → fluxo N8N → alerta observável + instruções de reprodução | 14 | ⬜ Pendente | — | **Depende de conta N8N Cloud (criar)** |
@@ -61,7 +61,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 8 | Tool integrada com validação e tratamento de falhas | 1 | `app/tools/` ✅ |
 | 9 | Memória/contexto adequada | 3 | Checkpointer `MemorySaver` + histórico via tool ✅ |
 | 10 | Segurança, autonomia, cenário adversarial | 4 | `app/security/` + evidência adversarial real ✅ |
-| 11 | 2 sinais de observabilidade + timeout/retry/fallback | 5 | `app/observability/` + logs |
+| 11 | 2 sinais de observabilidade + timeout/retry/fallback | 5 | Logs JSON + métricas `/metrics` + audit JSONL ✅ |
 | 12 | IA em code review + testes (integração/aceitação/E2E) + priorização por risco | 6 | `docs/qa/` |
 | 13 | Pipeline + IA analisa logs + anomalia + estimativa de risco | 7 | `.github/workflows/` + `docs/evidencias/` |
 | 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo N8N + screenshots |
@@ -113,3 +113,4 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 29/08 | Revisão documental pré-Parte 3: correções posteriores registradas na fase 1, README expandido, execução real `e2e-real-001` arquivada em `docs/evidencias/execucoes/` |
 | 29/08 | Parte 3 concluída: API FastAPI com contrato Pydantic, checkpointer por thread de cliente e smoke test real registrado em evidências |
 | 29/08 | Parte 4 concluída: módulo de segurança (injection + ações destrutivas), audit JSONL correlacionado e cenário adversarial real com 2 ataques bloqueados; Refinamento 2 (correlação do audit) documentado |
+| 29/08 | Parte 5 concluída: logs JSON por node, métricas com `/metrics` e investigação de execução documentada com 3 sinais correlacionados por `request_id` |

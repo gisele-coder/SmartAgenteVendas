@@ -1,7 +1,15 @@
+import time
+
 import pandas as pd
 
+from app.config import settings
 from app.tools.loader import load_orders
 from app.tools.schemas import CustomerOrders, OrderItem
+
+
+def _simulate_delay() -> None:
+    if settings.tool_delay_ms > 0:
+        time.sleep(settings.tool_delay_ms / 1000)
 
 
 def _to_item(row: pd.Series) -> OrderItem:
@@ -30,6 +38,7 @@ def get_customer_orders(customer_id: int) -> CustomerOrders:
     if not isinstance(customer_id, int) or customer_id <= 0:
         raise ValueError("customer_id deve ser um inteiro positivo")
 
+    _simulate_delay()
     df = load_orders()
     rows = df[df["cliente"] == customer_id]
     items = [_to_item(row) for _, row in rows.iterrows()]
