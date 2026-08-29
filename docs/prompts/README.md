@@ -18,6 +18,7 @@ Esta pasta concentra a documentação de **prompts do agente**, conforme exigido
 - Registrar **regras de comportamento**, objetivos da tarefa, restrições importantes e padrões de resposta esperados
 - Preservar o **histórico de refinamentos**, apresentando o problema observado, a alteração realizada e o resultado obtido
 - Evitar que prompts sensíveis fiquem dispersos pelo código
+- **Comprovar o desenvolvimento assistido por IA**: a subpasta [`desenvolvimento/`](./desenvolvimento/README.md) registra os prompts reais usados em cada fase do projeto
 
 ---
 
@@ -28,6 +29,7 @@ Esta pasta concentra a documentação de **prompts do agente**, conforme exigido
 | `README.md` | Este arquivo — visão geral da pasta |
 | `system.md` | Prompt de sistema principal do agente (regras, objetivos, restrições) |
 | `refinamentos/` | Histórico iterativo de ajustes de prompt |
+| [`desenvolvimento/`](./desenvolvimento/README.md) | Prompts das fases de desenvolvimento assistido por IA (evidência por fase) |
 | `outros-prompts.md` | Prompts auxiliares (ferramentas, validações, cenários específicos) |
 
 ---
