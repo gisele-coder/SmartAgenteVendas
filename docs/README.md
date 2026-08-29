@@ -21,7 +21,7 @@ Esta pasta concentra **toda a documentação do projeto** conforme exigido pelo 
 | Subpasta | Finalidade | Status |
 |---|---|---|
 | [`prompts/`](./prompts/README.md) | Prompts do sistema, prompts por fase de desenvolvimento e histórico de refinamentos | ✅ Ativa (5 fases + 2 refinamentos) |
-| [`qa/`](./qa/README.md) | Evidências de QA: code review, testes, priorização por risco | Placeholder (populada na Parte 6) |
+| [`qa/`](./qa/README.md) | Evidências de QA: code review com IA, cobertura, priorização por risco | ✅ Ativa (Parte 6) |
 | [`evidencias/`](./evidencias/README.md) | Logs, traces, métricas, screenshots e artefatos de execução | ✅ Ativa (4 evidências arquivadas) |
 
 ## Documentos Externos

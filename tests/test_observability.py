@@ -122,6 +122,23 @@ def test_grafo_emite_logs_json_por_node(caplog):
     assert "finalize_response" in nodes
 
 
+def test_metricas_registram_falha_de_invocacao(monkeypatch):
+    from app.graph.builder import run_recommendation
+
+    def _boom():
+        raise RuntimeError("falha simulada da tool")
+
+    monkeypatch.setattr("app.graph.builder.build_graph", _boom)
+    with pytest.raises(RuntimeError):
+        run_recommendation(
+            {"request_id": "fail-001", "customer_id": 100011, "query": ""},
+            llm=FakeLLM("{}"),
+        )
+    snap = snapshot()
+    assert snap["runs_total"] == 1
+    assert snap["error_total"] == 1
+
+
 def test_endpoint_metrics():
     from fastapi.testclient import TestClient
 

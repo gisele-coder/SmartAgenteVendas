@@ -21,26 +21,27 @@ Esta pasta concentra as **evidências de QA** do projeto, conforme exigido pelo 
 
 ---
 
-## Estrutura Sugerida
+## Status atual
+
+- ✅ **Code review com IA de diff real**: [`code-reviews/review-07fbd7f-observabilidade.md`](./code-reviews/review-07fbd7f-observabilidade.md) — achado A1 corrigido (falhas de invocação agora contam nas métricas)
+- ✅ **Cobertura**: [`relatorios/relatorio-cobertura-2026-08-29.md`](./relatorios/relatorio-cobertura-2026-08-29.md) — 95% total, 42 testes
+- ✅ **Priorização por risco**: [`priorizacao-risco.md`](./priorizacao-risco.md) — matriz com 6 cenários; prioridade 1 = acesso indevido a dados de outros clientes
+- ✅ **Tipos de teste**: unitários + integração (HTTP→grafo→tools→base) + E2E real com LLM
+
+## Estrutura
 
 | Arquivo / Pasta | Conteúdo |
 |---|---|
 | `README.md` | Este arquivo — visão geral da pasta |
 | `code-reviews/` | Relatórios de revisão de código com IA (diffs analisados, problemas encontrados, sugestões) |
-| `testes/` | Suites de teste, incluindo ao menos um tipo entre integração, aceitação ou E2E |
-| `relatorios/` | Sumários periódicos de qualidade, cobertura e resultados |
+| `relatorios/` | Sumários de qualidade, cobertura e resultados |
 | `priorizacao-risco.md` | Justificativa do(s) teste(s) priorizado(s) por risco, impacto ou criticidade |
 
 ---
 
 ## Quando Popular
 
-Esta pasta deve começar a ser preenchida assim que:
-
-1. Houver um **Pull Request real** analisado com IA (critério #12 do brief)
-2. Existir **testes relevantes** gerados ou refinados com apoio de IA
-3. Ao menos um teste for **selecionado como prioritário** com justificativa documentada
-4. Os testes forem executados (com **evidência de execução** armazenada em [`../evidencias/`](../evidencias/README.md))
+✅ Populada na Parte 6 (29/08): PR real analisado com IA, testes de integração/E2E consolidados, priorização por risco documentada e relatório de cobertura arquivado.
 
 ---
 

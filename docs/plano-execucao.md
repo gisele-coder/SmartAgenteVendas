@@ -40,7 +40,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 3 | **API + Memória** | `POST /recomendacoes`, `request_id` por execução, `MemorySaver` (checkpointer), perfil do cliente no State | 5, 9 | ✅ **Concluída** | pytest 24 passed · smoke real uvicorn+curl (`api-668b104164e6`) · branch `feature/api-memoria` | Memória por thread de cliente (`previous_recommendations`); DI do LLM para testes sem rede |
 | 4 | **Segurança** | Módulo `app/security/` (guard: injection + ações destrutivas com normalização; audit JSONL), bloqueio pré-LLM, agente somente-leitura, cenário adversarial real | 10 | ✅ **Concluída** | pytest 34 passed · evidência `adversarial-fase-4.md` (2 ataques bloqueados via HTTP) · branch `feature/governanca` | Bug de correlação do audit descoberto pela evidência → Refinamento 2 |
 | 5 | **Observabilidade** | Logs JSON por node (`logs/execution.log`), métricas agregadas + `GET /metrics`, audit JSONL correlacionado por `request_id`, timeout/retry no LLM, delay simulável na tool | 11 | ✅ **Concluída** | pytest 41 passed · evidência `observabilidade-fase-5.md` (3 execuções, 3 sinais correlacionados) · branch `feature/observabilidade` | Bug de chaves não declaradas no State corrigido; LLM confirmado como gargalo (98,8%) |
-| 6 | **QA** | Testes unitários + integração (TestClient→grafo→tool→xlsx), teste prioritário por risco, code review com IA de PR real | 12 | ⬜ Pendente | — | Prioridade 1: acesso a dados de outro cliente (impacto alto) |
+| 6 | **QA** | Code review com IA de diff real (commit `07fbd7f`: 4 achados, 1 correção), cobertura 95% arquivada, priorização por risco (matriz 6 cenários), testes unit+integração+E2E consolidados | 12 | ✅ **Concluída** | pytest 42 passed · `docs/qa/` populada (review + relatório + matriz) · branch `feature/qa-inteligente` | Achado A1: falhas de invocação agora contam nas métricas |
 | 7 | **DevOps** | CI GitHub Actions (ruff→pytest→build), anomalia simulada (timeout tool), IA analisa logs de ≥2 etapas, estimativa de tendência/risco | 13 | ⬜ Pendente | — | Key LLM no CI via GitHub Secret; testes pulam sem key |
 | 8 | **N8N Low-code** | Webhook `security_blocked`/`recommendation_failed` → fluxo N8N → alerta observável + instruções de reprodução | 14 | ⬜ Pendente | — | **Depende de conta N8N Cloud (criar)** |
 | 9 | **Finalização** | `docs/prompts/system.md` + ciclo de refinamento, README completo (seção 5.2), evidências, vídeo (roteiro 5.5), merge `develop→main`, submissão AVA | 1, 4, 15 | ⬜ Pendente | — | **Revogar API key após a entrega** |
@@ -62,7 +62,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 9 | Memória/contexto adequada | 3 | Checkpointer `MemorySaver` + histórico via tool ✅ |
 | 10 | Segurança, autonomia, cenário adversarial | 4 | `app/security/` + evidência adversarial real ✅ |
 | 11 | 2 sinais de observabilidade + timeout/retry/fallback | 5 | Logs JSON + métricas `/metrics` + audit JSONL ✅ |
-| 12 | IA em code review + testes (integração/aceitação/E2E) + priorização por risco | 6 | `docs/qa/` |
+| 12 | IA em code review + testes (integração/aceitação/E2E) + priorização por risco | 6 | `docs/qa/` (review, cobertura 95%, matriz de risco) ✅ |
 | 13 | Pipeline + IA analisa logs + anomalia + estimativa de risco | 7 | `.github/workflows/` + `docs/evidencias/` |
 | 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo N8N + screenshots |
 | 15 | Refinamento documentado (problema→alteração→resultado) | 9 | `docs/prompts/refinamentos/` |
@@ -114,3 +114,4 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 29/08 | Parte 3 concluída: API FastAPI com contrato Pydantic, checkpointer por thread de cliente e smoke test real registrado em evidências |
 | 29/08 | Parte 4 concluída: módulo de segurança (injection + ações destrutivas), audit JSONL correlacionado e cenário adversarial real com 2 ataques bloqueados; Refinamento 2 (correlação do audit) documentado |
 | 29/08 | Parte 5 concluída: logs JSON por node, métricas com `/metrics` e investigação de execução documentada com 3 sinais correlacionados por `request_id` |
+| 29/08 | Parte 6 concluída: code review com IA de diff real (correção aplicada), cobertura 95% e priorização de testes por risco documentadas em `docs/qa/` |
