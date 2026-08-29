@@ -36,6 +36,10 @@ def _audit(event: str, **extra) -> dict:
 
 def validate_input(state: dict) -> dict:
     customer_id = state.get("customer_id")
+    previous = [
+        {"cod_prod": rec["cod_prod"], "product": rec["product"]}
+        for rec in state.get("recommendations", [])[:5]
+    ]
     errors = list(state.get("errors", []))
     if not isinstance(customer_id, int) or isinstance(customer_id, bool) or customer_id <= 0:
         errors.append("customer_id inválido")
@@ -43,7 +47,14 @@ def validate_input(state: dict) -> dict:
     if not customer_exists(customer_id):
         errors.append(f"cliente {customer_id} inexistente")
         return {"validated": False, "errors": errors}
-    return {"validated": True, "audit_events": [_audit("input_validated", customer_id=customer_id)]}
+    return {
+        "validated": True,
+        "errors": [],
+        "previous_recommendations": previous,
+        "audit_events": [
+            _audit("input_validated", customer_id=customer_id, has_memory=bool(previous))
+        ],
+    }
 
 
 def security_check(state: dict) -> dict:
@@ -117,6 +128,7 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
         return {
             "llm_recommendations": parsed,
             "fallback_used": False,
+            "errors": [],
             "audit_events": [_audit("recommendation_generated", count=len(parsed), source="llm")],
         }
     except Exception as exc:  # noqa: BLE001
@@ -190,13 +202,21 @@ def finalize_response(state: dict) -> dict:
     else:
         status = "success"
 
+    if status == "success":
+        recommendations = state.get("recommendations", [])
+        fallback_used = bool(state.get("fallback_used"))
+    else:
+        recommendations = []
+        fallback_used = False
+
     output = {
         "request_id": state.get("request_id", "n/a"),
         "customer_id": state.get("customer_id"),
         "status": status,
         "customer_profile": _build_profile(state.get("purchase_history", [])),
-        "recommendations": state.get("recommendations", []),
-        "fallback_used": bool(state.get("fallback_used")),
+        "recommendations": recommendations,
+        "previous_recommendations": state.get("previous_recommendations", []),
+        "fallback_used": fallback_used,
         "errors": list(state.get("errors", [])),
     }
     if status == "blocked":

@@ -11,9 +11,10 @@ class RecommendationState(TypedDict, total=False):
     block_reason: str
     purchase_history: list[dict]
     similar_products: list[dict]
+    previous_recommendations: list[dict]
     llm_recommendations: list[dict]
     recommendations: list[dict]
     fallback_used: bool
-    errors: Annotated[list[str], operator.add]
+    errors: list[str]
     output: dict
     audit_events: Annotated[list[dict], operator.add]
