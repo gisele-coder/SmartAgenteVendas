@@ -41,6 +41,7 @@ Esta pasta concentra **artefatos comprobatórios de execução** do projeto, con
 |---|---|---|---|
 | 29/08 | Execução real E2E do grafo (`e2e-real-001`) — cliente 100011, padrão climatização | 2 | [`execucoes/e2e-real-001-fase-2.md`](./execucoes/e2e-real-001-fase-2.md) |
 | 29/08 | Smoke test HTTP da API (`668b104164e6`) — uvicorn + curl, LLM real | 3 | [`execucoes/api-668b104164e6-fase-3.md`](./execucoes/api-668b104164e6-fase-3.md) |
+| 29/08 | Cenários adversariais (injection + ação destrutiva) bloqueados via HTTP com audit correlacionado | 4 | [`seguranca/adversarial-fase-4.md`](./seguranca/adversarial-fase-4.md) |
 
 ---
 

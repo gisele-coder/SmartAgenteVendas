@@ -14,6 +14,7 @@ from app.graph.nodes import (
     validate_recommendations,
 )
 from app.graph.state import RecommendationState
+from app.security.audit import write_audit
 
 
 def route_after_validation(state: dict) -> str:
@@ -61,4 +62,12 @@ def run_recommendation(request: dict, llm=None) -> dict:
     if llm is not None:
         configurable["llm"] = llm
     result = build_graph().invoke(request, config={"configurable": configurable})
-    return result["output"]
+    output = result["output"]
+    request_id = output.get("request_id", "n/a")
+    events = [
+        event
+        for event in result.get("audit_events", [])
+        if event.get("request_id") == request_id
+    ]
+    write_audit(request_id, events)
+    return output
