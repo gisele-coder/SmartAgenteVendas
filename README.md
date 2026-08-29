@@ -129,4 +129,4 @@ ruff check .    # lint
 Toda a documentação e evidências: [`docs/README.md`](docs/README.md)
 Destaque: [`docs/plano-execucao.md`](docs/plano-execucao.md) (partes 0-9, critérios, evidências) · [`docs/prompts/system.md`](docs/prompts/system.md) (prompt do agente) · [`docs/prompts/desenvolvimento/`](docs/prompts/desenvolvimento/README.md) (prompts por fase)
 
-> **Status**: partes 0-7 concluídas (fundação, tools, núcleo LangGraph, API+memória, segurança, observabilidade, QA, DevOps). Próximas: N8N, README final + vídeo.
+> **Status**: partes 0-7 concluídas (fundação, tools, núcleo LangGraph, API+memória, segurança, observabilidade, QA, DevOps). Próximas: low-code (Flowise), README final + vídeo.

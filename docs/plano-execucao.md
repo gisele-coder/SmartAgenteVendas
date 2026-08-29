@@ -22,7 +22,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | Saída | JSON estruturado: perfil do cliente + recomendações justificadas + status |
 | Modalidade | **Individual** (brief seção 3) |
 | Formato | API local (FastAPI) |
-| Stack | Python 3.11+ · LangGraph · FastAPI · Pydantic v2 · pandas+openpyxl · pytest · ruff · GitHub Actions · N8N Cloud |
+| Stack | Python 3.11+ · LangGraph · FastAPI · Pydantic v2 · pandas+openpyxl · pytest · ruff · GitHub Actions · Flowise Cloud (low-code) |
 | LLM | Gateway OpenCode (`https://opencode.ai/zen/v1`), modelo **`hy3-free`** (conta sem saldo; planos B: `nemotron-3.5-lightning-free`) — config 100% por env |
 | Base de dados | `data/base_ficticia_pedidos_agente_ia.xlsx` — 343 itens, 120 pedidos, 12 clientes, 22 produtos (estrutura 100% confirmada) |
 | Entrega | **31/08/26 às 15h** (submissão no AVA: repo + quadro + vídeo) |
@@ -42,7 +42,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 5 | **Observabilidade** | Logs JSON por node (`logs/execution.log`), métricas agregadas + `GET /metrics`, audit JSONL correlacionado por `request_id`, timeout/retry no LLM, delay simulável na tool | 11 | ✅ **Concluída** | pytest 41 passed · evidência `observabilidade-fase-5.md` (3 execuções, 3 sinais correlacionados) · branch `feature/observabilidade` | Bug de chaves não declaradas no State corrigido; LLM confirmado como gargalo (98,8%) |
 | 6 | **QA** | Code review com IA de diff real (commit `07fbd7f`: 4 achados, 1 correção), cobertura 95% arquivada, priorização por risco (matriz 6 cenários), testes unit+integração+E2E consolidados | 12 | ✅ **Concluída** | pytest 42 passed · `docs/qa/` populada (review + relatório + matriz) · branch `feature/qa-inteligente` | Achado A1: falhas de invocação agora contam nas métricas |
 | 7 | **DevOps** | CI GitHub Actions (ruff→pytest+cobertura→wheel, secret LLM_API_KEY), IA analisa 3 estágios do pipeline, anomalia linear detectada na run 5 de série de 8, regressão + projeção de SLA | 13 | ✅ **Concluída** | pipeline 3/3 local · `evidencias/pipeline/`, `anomalias/`, `metricas/` · branch `feature/devops-anomalias` | Risco ALTO: SLA 2s violado em ~3 runs se tendência continuar |
-| 8 | **N8N Low-code** | Webhook `security_blocked`/`recommendation_failed` → fluxo N8N → alerta observável + instruções de reprodução | 14 | ⬜ Pendente | — | **Depende de conta N8N Cloud (criar)** |
+| 8 | **Flowise Low-code** | `app/integrations/flowise.py` (webhook best-effort nos eventos `security_blocked`/`recommendation_generation_failed`) → Chatflow Flowise (ChatOpenAI Custom `hy3-free` + prompt SRE + Custom Function) → alerta no Discord + resposta registrada; export JSON do fluxo versionado | 14 | ⬜ Pendente | — | **Decisão 29/08**: N8N trial expirou; professor aprovou Flowise (construção visual de agentes). Requer: conta Flowise Cloud + webhook Discord |
 | 9 | **Finalização** | `docs/prompts/system.md` + ciclo de refinamento, README completo (seção 5.2), evidências, vídeo (roteiro 5.5), merge `develop→main`, submissão AVA | 1, 4, 15 | ⬜ Pendente | — | **Revogar API key após a entrega** |
 
 ---
@@ -64,7 +64,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 11 | 2 sinais de observabilidade + timeout/retry/fallback | 5 | Logs JSON + métricas `/metrics` + audit JSONL ✅ |
 | 12 | IA em code review + testes (integração/aceitação/E2E) + priorização por risco | 6 | `docs/qa/` (review, cobertura 95%, matriz de risco) ✅ |
 | 13 | Pipeline + IA analisa logs + anomalia + estimativa de risco | 7 | CI yml + pipeline/evidências + regressão/projeção ✅ |
-| 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo N8N + screenshots |
+| 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo Flowise (export JSON) + evidência end-to-end |
 | 15 | Refinamento documentado (problema→alteração→resultado) | 9 | `docs/prompts/refinamentos/` |
 
 ---
@@ -73,9 +73,9 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 
 ### Pendências do usuário (não bloqueiam o código)
 - [ ] **Convidar o professor como colaborador** no repo (checklist do brief)
-- [ ] **Criar conta N8N Cloud** (necessária na Parte 8)
+- [x] ~~Criar conta N8N Cloud~~ → **Decisão 29/08**: N8N Cloud expirou o trial; professor aprovou **Flowise** como alternativa (e melhor fit com o critério: construção visual de agentes). Pendências atuais: conta Flowise Cloud (free tier) + webhook Discord
 - [ ] Manter o **Kanban atualizado** a cada parte (cards prontos na conversa; mover "Fluxo LangGraph" para Em Andamento agora)
-- [ ] Gravar o vídeo (roteiro 5.5: 0-1 problema, 1-2 arquitetura, 2-4 cenários, 4-5 segurança, 5-6 QA, 6-8 pipeline/anomalia/risco, 8-9 N8N, 9-10 limitações)
+- [ ] Gravar o vídeo (roteiro 5.5: 0-1 problema, 1-2 arquitetura, 2-4 cenários, 4-5 segurança, 5-6 QA, 6-8 pipeline/anomalia/risco, 8-9 low-code Flowise, 9-10 limitações)
 
 ### Riscos e mitigações
 | Risco | Mitigação |
@@ -99,7 +99,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | Dia | Partes | Resultado esperado |
 |---|---|---|
 | **Sáb 29/08** | 0 ✅ · 1 ✅ · 2 | Núcleo LangGraph funcionando end-to-end em modo texto |
-| **Dom 30/08** | 3, 4, 5, 6, 7, 8 | API completa, segura, observável, testada, com CI e N8N |
+| **Dom 30/08** | 3, 4, 5, 6, 7, 8 | API completa, segura, observável, testada, com CI e low-code (Flowise) |
 | **Seg 31/08** | 9 | README final, vídeo, evidências, merge `main`, AVA até **15h** |
 
 ---
@@ -116,3 +116,4 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 29/08 | Parte 5 concluída: logs JSON por node, métricas com `/metrics` e investigação de execução documentada com 3 sinais correlacionados por `request_id` |
 | 29/08 | Parte 6 concluída: code review com IA de diff real (correção aplicada), cobertura 95% e priorização de testes por risco documentadas em `docs/qa/` |
 | 29/08 | Parte 7 concluída: CI configurado (ruff→pytest→wheel), IA analisa 3 estágios, anomalia linear detectada/explicada e estimativa de tendência/risco (ALTO) documentadas |
+| 29/08 | Decisão de low-code: N8N Cloud expirou → **Flowise** (aprovação do professor, melhor fit com construção visual de agentes); plano da Parte 8 atualizado (Flowise Cloud + Discord + hy3-free) |
