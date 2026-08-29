@@ -11,6 +11,7 @@ Esta pasta concentra **toda a documentação do projeto** conforme exigido pelo 
 | Arquivo | Tipo | Descrição |
 |---|---|---|
 | [`Projeto_Avaliativo_modulo_2.md`](./Projeto_Avaliativo_modulo_2.md) | Brief | Enunciado institucional da Situação de Aprendizagem — Módulo 2 |
+| [`plano-execucao.md`](./plano-execucao.md) | Doc mestre | Partes 0-9, critérios atendidos, evidências e observações de entrega (atualizado por parte) |
 | [`sobre_a_planilha.md`](./sobre_a_planilha.md) | Doc interna | Descrição narrativa da base fictícia de pedidos |
 | [`estrutura_planilha.md`](./estrutura_planilha.md) | Doc interna | Mapa técnico da planilha (abas e colunas) |
 | [`../data/base_ficticia_pedidos_agente_ia.xlsx`](../data/base_ficticia_pedidos_agente_ia.xlsx) | Anexo | Base de dados fictícia para testes do agente (movida para `data/` em 29/08) |
