@@ -51,3 +51,16 @@ fase: 1 — Dados + Tools
 | Lint | `ruff check .` → All checks passed |
 | Branch | `feature/tool-dados` (fluxo develop → feature, seção 5.4 do brief) |
 | Doc atualizado | `docs/estrutura_planilha.md` — lacunas marcadas como resolvidas + seção `## Correções` |
+
+---
+
+## Correções Posteriores (registradas na fase 2)
+
+Durante a integração do grafo (fase 2), descobriu-se que:
+
+1. **A coocorrência implementada nesta fase tinha um bug de lógica**: olhava apenas os pedidos do próprio cliente — onde todo item já é dele — retornando sempre `[]`, para todos os clientes.
+2. **Dois testes desta fase eram vacuos** (`test_coocorrencia_exclui_produtos_ja_comprados` e `test_fallback...`): asserts sobre listas vazias passavam sem testar nada.
+
+**Correção aplicada na fase 2**: lógica *market-basket* (pedidos de qualquer cliente contendo produtos do perfil) + asserts de não-vazio. Detalhes completos em [`fase-2-langgraph.md`](./fase-2-langgraph.md).
+
+> Nota metodológica: o registro honesto do erro e da correção é parte das evidências de desenvolvimento (critérios 12 e 15 do brief).

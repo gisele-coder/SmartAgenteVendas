@@ -110,3 +110,4 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 |---|---|
 | 29/08 | Criação do documento; Partes 0 e 1 concluídas com evidências |
 | 29/08 | Parte 2 concluída: grafo LangGraph com paralelização e fallback validado end-to-end com o modelo real; 3 bugs corrigidos; Refinamento 1 documentado (`docs/prompts/refinamentos/`) |
+| 29/08 | Revisão documental pré-Parte 3: correções posteriores registradas na fase 1, README expandido, execução real `e2e-real-001` arquivada em `docs/evidencias/execucoes/` |

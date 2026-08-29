@@ -1,3 +1,5 @@
+> **NOTA (29/08):** este arquivo é o registro do **planejamento inicial** (conversa de ideação). O plano vivo e autoritativo de execução — partes 0-9, critérios, evidências e observações — está em [`docs/plano-execucao.md`](docs/plano-execucao.md).
+
 Excelente escolha. A **Ideia 2** tem uma vantagem estratégica: vocês fazem um projeto suficientemente pequeno para entregar até dia 31, mas o núcleo pode depois evoluir para algo útil para seu cliente. 🛒🤖
 
 E ela encaixa muito bem nos requisitos do trabalho: fluxo com LangGraph, tool integrada, contexto baseado no histórico de pedidos, segurança, observabilidade, testes, pipeline e automação low-code. 
