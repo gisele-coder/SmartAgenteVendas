@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     llm_max_retries: int = 2
 
     data_path: str = "data/base_ficticia_pedidos_agente_ia.xlsx"
+    audit_path: str = "logs/audit.jsonl"
 
 
 settings = Settings()

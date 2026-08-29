@@ -5,33 +5,19 @@ from langchain_core.runnables import RunnableConfig
 
 from app.graph.prompts import SYSTEM_PROMPT, build_user_prompt
 from app.llm import get_llm
+from app.security.guard import analyze_query
 from app.tools.loader import get_catalog
 from app.tools.orders import customer_exists, get_customer_orders
 from app.tools.similar import find_similar_products
 
-INJECTION_PATTERNS = (
-    "ignore suas regras",
-    "ignore as regras",
-    "desconsidere",
-    "ignore previous",
-    "ignore all previous",
-    "instruções do sistema",
-    "instrucoes do sistema",
-    "system prompt",
-    "mostre todos os clientes",
-    "todos os clientes",
-    "histórico completo de todos",
-    "historico completo de todos",
-    "revele os dados",
-    "revele dados",
-    "você é livre",
-    "voce e livre",
-    "modo desenvolvedor",
-)
 
-
-def _audit(event: str, **extra) -> dict:
-    return {"event": event, "ts_ms": round(time.perf_counter() * 1000), **extra}
+def _audit(state: dict, event: str, **extra) -> dict:
+    return {
+        "event": event,
+        "request_id": state.get("request_id", "n/a"),
+        "ts_ms": round(time.perf_counter() * 1000),
+        **extra,
+    }
 
 
 def validate_input(state: dict) -> dict:
@@ -52,21 +38,28 @@ def validate_input(state: dict) -> dict:
         "errors": [],
         "previous_recommendations": previous,
         "audit_events": [
-            _audit("input_validated", customer_id=customer_id, has_memory=bool(previous))
+            _audit(state, "input_validated", customer_id=customer_id, has_memory=bool(previous))
         ],
     }
 
 
 def security_check(state: dict) -> dict:
-    query = (state.get("query") or "").lower()
-    matched = [pattern for pattern in INJECTION_PATTERNS if pattern in query]
-    if matched:
+    analysis = analyze_query(state.get("query") or "")
+    if not analysis["safe"]:
+        kind = analysis["kind"]
+        reason = (
+            "possível prompt injection detectado na consulta"
+            if kind == "injection"
+            else "ação destrutiva/não autorizada (limite de autonomia)"
+        )
         return {
             "security_status": "blocked",
-            "block_reason": "possível prompt injection detectado na consulta",
-            "audit_events": [_audit("security_blocked", patterns=list(matched))],
+            "block_reason": reason,
+            "audit_events": [
+                _audit(state, "security_blocked", kind=kind, patterns=analysis["patterns"][:3])
+            ],
         }
-    return {"security_status": "ok", "audit_events": [_audit("security_ok")]}
+    return {"security_status": "ok", "audit_events": [_audit(state, "security_ok")]}
 
 
 def get_purchase_history(state: dict) -> dict:
@@ -74,7 +67,7 @@ def get_purchase_history(state: dict) -> dict:
     return {
         "purchase_history": [item.model_dump() for item in result.items],
         "audit_events": [
-            _audit("history_retrieved", items=len(result.items), orders=result.orders_count)
+            _audit(state, "history_retrieved", items=len(result.items), orders=result.orders_count)
         ],
     }
 
@@ -83,7 +76,7 @@ def find_similar_products_node(state: dict) -> dict:
     result = find_similar_products(state["customer_id"], limit=5)
     return {
         "similar_products": [item.model_dump() for item in result],
-        "audit_events": [_audit("similar_retrieved", count=len(result))],
+        "audit_events": [_audit(state, "similar_retrieved", count=len(result))],
     }
 
 
@@ -129,14 +122,16 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
             "llm_recommendations": parsed,
             "fallback_used": False,
             "errors": [],
-            "audit_events": [_audit("recommendation_generated", count=len(parsed), source="llm")],
+            "audit_events": [
+                _audit(state, "recommendation_generated", count=len(parsed), source="llm")
+            ],
         }
     except Exception as exc:  # noqa: BLE001
         return {
             "llm_recommendations": [],
             "fallback_used": True,
             "errors": [f"geração por LLM falhou: {exc}"],
-            "audit_events": [_audit("llm_failed", error=str(exc)[:120])],
+            "audit_events": [_audit(state, "llm_failed", error=str(exc)[:120])],
         }
 
 
@@ -162,13 +157,15 @@ def validate_recommendations(state: dict) -> dict:
 
     return {
         "recommendations": valid,
-        "audit_events": [_audit("recommendations_validated", count=len(valid))],
+        "audit_events": [_audit(state, "recommendations_validated", count=len(valid))],
     }
 
 
 def block_request(state: dict) -> dict:
     return {
-        "audit_events": [_audit("request_blocked", reason=state.get("block_reason", ""))],
+        "audit_events": [
+            _audit(state, "request_blocked", reason=state.get("block_reason", ""))
+        ],
     }
 
 
@@ -223,5 +220,5 @@ def finalize_response(state: dict) -> dict:
         output["reason"] = state.get("block_reason", "")
     return {
         "output": output,
-        "audit_events": [_audit("response_completed", status=status)],
+        "audit_events": [_audit(state, "response_completed", status=status)],
     }
