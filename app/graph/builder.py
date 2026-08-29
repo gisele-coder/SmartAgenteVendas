@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from app.graph.nodes import (
@@ -52,10 +53,12 @@ def build_graph():
     graph.add_edge("block_request", "finalize_response")
     graph.add_edge("finalize_response", END)
 
-    return graph.compile()
+    return graph.compile(checkpointer=MemorySaver())
 
 
 def run_recommendation(request: dict, llm=None) -> dict:
-    config = {"configurable": {"llm": llm}} if llm is not None else None
-    result = build_graph().invoke(request, config=config)
+    configurable: dict = {"thread_id": f"customer-{request.get('customer_id')}"}
+    if llm is not None:
+        configurable["llm"] = llm
+    result = build_graph().invoke(request, config={"configurable": configurable})
     return result["output"]

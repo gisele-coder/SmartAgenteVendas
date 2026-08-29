@@ -7,4 +7,7 @@ def test_health():
     client = TestClient(app)
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "service": "smartorder-ai"}
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["service"] == "smartorder-ai"
+    assert "model" in body
