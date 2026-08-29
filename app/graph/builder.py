@@ -64,7 +64,12 @@ def run_recommendation(request: dict, llm=None) -> dict:
     if llm is not None:
         configurable["llm"] = llm
     t0 = time.perf_counter()
-    result = build_graph().invoke(request, config={"configurable": configurable})
+    try:
+        result = build_graph().invoke(request, config={"configurable": configurable})
+    except Exception:
+        total_ms = round((time.perf_counter() - t0) * 1000, 1)
+        record_run("error", True, 0, total_ms, 0.0)
+        raise
     total_ms = round((time.perf_counter() - t0) * 1000, 1)
     output = result["output"]
     request_id = output.get("request_id", "n/a")

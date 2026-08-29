@@ -91,8 +91,9 @@ Evidências de execução em [`docs/evidencias/`](docs/evidencias/README.md).
 ## QA, observabilidade e DevOps
 
 - **Sinais correlacionados por `request_id`**: logs JSON por node (`logs/execution.log`), métricas agregadas (`GET /metrics`: contadores, latências avg/max, taxas de bloqueio/fallback) e audit JSONL (`logs/audit.jsonl`)
-- **Tratamento de falhas**: LLM com timeout + retry + fallback determinístico; `settings.tool_delay_ms` permite simular degradação de tool para anomalias
-- Pipeline CI (lint/testes/build) e análise de anomalias: Partes 6-7 em andamento
+- **Tratamento de falhas**: LLM com timeout + retry + fallback determinístico; falhas de invocação também contam nas métricas; `settings.tool_delay_ms` permite simular degradação de tool
+- **QA**: code review com IA de diff real (correção aplicada), cobertura 95% (42 testes), priorização por risco — ver [`docs/qa/`](docs/qa/README.md)
+- Pipeline CI (lint/testes/build) e análise de anomalias: Parte 7 em andamento
 
 ## Instalação e execução
 
@@ -127,4 +128,4 @@ ruff check .    # lint
 Toda a documentação e evidências: [`docs/README.md`](docs/README.md)
 Destaque: [`docs/plano-execucao.md`](docs/plano-execucao.md) (partes 0-9, critérios, evidências) · [`docs/prompts/system.md`](docs/prompts/system.md) (prompt do agente) · [`docs/prompts/desenvolvimento/`](docs/prompts/desenvolvimento/README.md) (prompts por fase)
 
-> **Status**: partes 0-5 concluídas (fundação, tools, núcleo LangGraph, API+memória, segurança, observabilidade). Próximas: QA, DevOps, N8N, README final + vídeo.
+> **Status**: partes 0-6 concluídas (fundação, tools, núcleo LangGraph, API+memória, segurança, observabilidade, QA). Próximas: DevOps, N8N, README final + vídeo.
