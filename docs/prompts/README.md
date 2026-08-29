@@ -34,13 +34,14 @@ Esta pasta concentra a documentação de **prompts do agente**, conforme exigido
 
 ---
 
-## Quando Popular
+## Status atual
 
-Esta pasta deve começar a ser preenchida assim que:
+Esta pasta já está populada:
 
-1. O **prompt de sistema principal** do agente estiver definido
-2. Houver pelo menos um **ciclo de refinamento** documentado (problema → alteração → resultado)
-3. Surgirem **prompts auxiliares** dignos de nota (ex.: prompt de tool de recomendação, prompt de validação)
+- [`system.md`](./system.md) — prompt de sistema principal (definido na Parte 2)
+- [`outros-prompts.md`](./outros-prompts.md) — prompt de usuário e prompts auxiliares
+- [`desenvolvimento/`](./desenvolvimento/README.md) — prompts das fases 0-5 com evidências
+- [`refinamentos/`](./refinamentos/README.md) — 2 ciclos de refinamento documentados (critério 15)
 
 > Lembrete: o modelo (LLM) deve ser configurado por **variável de ambiente**, nunca hardcoded no repositório (seção 4.10 do brief).
 
