@@ -11,6 +11,8 @@ class RecommendationState(TypedDict, total=False):
     block_reason: str
     purchase_history: list[dict]
     similar_products: list[dict]
+    history_ms: float
+    similar_ms: float
     previous_recommendations: list[dict]
     llm_recommendations: list[dict]
     recommendations: list[dict]

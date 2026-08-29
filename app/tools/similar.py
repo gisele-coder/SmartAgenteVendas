@@ -1,3 +1,6 @@
+import time
+
+from app.config import settings
 from app.tools.loader import load_orders
 from app.tools.schemas import SimilarProduct
 
@@ -9,6 +12,9 @@ def find_similar_products(customer_id: int, limit: int = DEFAULT_LIMIT) -> list[
         raise ValueError("customer_id deve ser um inteiro positivo")
     if not isinstance(limit, int) or limit <= 0:
         raise ValueError("limit deve ser um inteiro positivo")
+
+    if settings.tool_delay_ms > 0:
+        time.sleep(settings.tool_delay_ms / 1000)
 
     df = load_orders()
     customer_products = set(df.loc[df["cliente"] == customer_id, "cod_prod"].unique())

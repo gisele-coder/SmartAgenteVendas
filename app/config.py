@@ -14,6 +14,8 @@ class Settings(BaseSettings):
 
     data_path: str = "data/base_ficticia_pedidos_agente_ia.xlsx"
     audit_path: str = "logs/audit.jsonl"
+    log_path: str = "logs/execution.log"
+    tool_delay_ms: int = 0
 
 
 settings = Settings()
