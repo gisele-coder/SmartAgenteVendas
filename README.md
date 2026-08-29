@@ -96,6 +96,12 @@ Evidências de execução em [`docs/evidencias/`](docs/evidencias/README.md).
 - **Pipeline CI**: GitHub Actions (ruff → pytest+cobertura → wheel) — `.github/workflows/ci.yml`; a IA analisa os logs das etapas
 - **Anomalias e risco**: série real com degradação linear detectada na run 5; regressão projeta violação de SLA (2 s) em ~3 execuções — ver [`docs/evidencias/`](docs/evidencias/README.md)
 
+## Automação low-code (Flowise)
+
+Eventos operacionais (`security_blocked`, `recommendation_generation_failed`) são enviados (best-effort, `FLOWISE_ALERTS_ENABLED=true`) a um **Chatflow no Flowise Cloud** — ChatOpenAI Custom (`hy3-free` via gateway OpenCode) + prompt SRE + Custom Function — que classifica severidade/causa/ação e **envia o alerta ao Discord**. A lógica principal permanece na aplicação; o Flowise é apoio visual.
+
+Reprodução passo a passo (Discord webhook + Chatflow + `.env`): [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md)
+
 ## Instalação e execução
 
 ```bash
