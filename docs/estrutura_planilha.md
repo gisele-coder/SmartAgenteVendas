@@ -8,7 +8,7 @@ arquivo: [../data/base_ficticia_pedidos_agente_ia.xlsx](../data/base_ficticia_pe
 
 # Estrutura da Planilha — `base_ficticia_pedidos_agente_ia.xlsx`
 
-> **Nota importante:** este documento é uma **reconstrução parcial** feita a partir de [`sobre_a_planilha.md`](./sobre_a_planilha.md). Não foi possível ler diretamente o conteúdo do arquivo `.xlsx` (binário). **Abra o arquivo no Excel/LibreOffice e confirme as informações abaixo antes de usar como referência técnica.**
+> **Status:** ✅ **CONFIRMADO EM 29/08** via inspeção programática (`pandas`). Ver seção `## Correções` ao final deste documento.
 
 ---
 
@@ -25,16 +25,14 @@ Base fictícia estruturada para servir como **laboratório de testes** do agente
 
 ---
 
-## 2. Abas Prováveis
+## 2. Abas Confirmadas
 
-A planilha deve conter **pelo menos duas abas**. **Confirmar após abrir o arquivo:**
-
-| Aba | Conteúdo esperado | Confirmado? |
+| Aba | Conteúdo | Confirmado? |
 |---|---|---|
-| `Dados` (ou nome equivalente) | Tabela principal com 120 pedidos × 12 colunas + 343 linhas de itens detalhados | ☐ Pendente |
-| `LEIA_ME` | Instruções sobre como a base foi estruturada | ☐ Pendente |
+| `PEDIDOS` | Tabela principal: 343 linhas de itens × 12 colunas | ✅ Confirmado |
+| `LEIA_ME` | 6 linhas × 2 colunas (`CAMPO`, `DESCRICAO`) explicando a base | ✅ Confirmado |
 
-> Pode haver outras abas não mencionadas. Inspecionar o arquivo ao abrir.
+> Não há outras abas.
 
 ---
 
@@ -48,7 +46,7 @@ O esquema é o mesmo identificado para os pedidos reais do projeto. Tipos e desc
 | `CLIENTE` | Inteiro / String | Identificador único do cliente | Chave do cliente |
 | `QTD` | Inteiro | Quantidade do item no pedido | Sempre ≥ 1 |
 | `COD_PROD` | String | Código interno do produto | Chave do produto |
-| `VALOR` | Decimal | Valor unitário (ou total — **a confirmar**) | Moeda: BRL |
+| `VALOR` | Decimal | **Valor TOTAL da linha (BRL)** | Confirmado: `QTD × preço unitário` (unitários terminam em `.9`) |
 | `BARCODE` | String | Código de barras (EAN-13 ou similar) | Pode ter nulos |
 | `PRODUTO` | String | Descrição comercial do produto | Texto livre |
 | `MARCA` | String | Marca do produto | Pode ter nulos |
@@ -65,34 +63,43 @@ Estatísticas esperadas com base em `sobre_a_planilha.md`:
 
 | Métrica | Valor Esperado | Confirmado? |
 |---|---:|---|
-| Total de pedidos distintos | 120 | ☐ |
-| Total de linhas de itens | 343 | ☐ |
-| Clientes fictícios distintos | 12 | ☐ |
-| Produtos distintos | 22 | ☐ |
-| Média de itens por pedido | ~2,86 (343 / 120) | ☐ derivado |
-| Média de pedidos por cliente | ~10 (120 / 12) | ☐ derivado |
+| Total de pedidos distintos | 120 | ✅ |
+| Total de linhas de itens | 343 | ✅ |
+| Clientes fictícios distintos | 12 | ✅ |
+| Produtos distintos | 22 | ✅ |
+| Média de itens por pedido | ~2,86 (343 / 120) | ✅ derivado |
+| Pedidos por cliente (min / max / média) | 5 / 15 / 10,0 | ✅ medido |
 
 > A média calculada acima é apenas referência. Pedidos com múltiplos produtos são propositais (vide `sobre_a_planilha.md`, seção 4).
 
 ---
 
-## 5. Lacunas de Informação
+## 5. Lacunas — Resolvidas em 29/08
 
-Antes de usar a planilha como referência técnica, **confirmar manualmente**:
-
-- [ ] Nome exato das abas
-- [ ] Existência de abas adicionais além de `Dados` e `LEIA_ME`
-- [ ] Se `VALOR` representa valor unitário ou total da linha
-- [ ] Se há valores nulos em alguma coluna (`BARCODE`, `MARCA`, `REF` são candidatas)
-- [ ] Se o esquema é **plano** (uma linha por item) ou **normalizado** (uma linha por pedido com agregação)
-- [ ] Se há coluna de **data do pedido** (não mencionada, mas plausível)
-- [ ] Distribuição efetiva de pedidos por cliente
+- [x] Nome exato das abas → `PEDIDOS` e `LEIA_ME`
+- [x] Abas adicionais → nenhuma
+- [x] `VALOR` → **total da linha** (QTD × unitário; unitários terminam em `.9`)
+- [x] Nulos → **zero nulos em todas as 12 colunas**
+- [x] Esquema → **plano**: 1 linha por item; mesmo `PEDIDO` = itens comprados juntos; sem duplicatas `PEDIDO+COD_PROD`
+- [x] Coluna de data → **não existe**
+- [x] Distribuição por cliente → min 5, max 15, média 10,0 pedidos/cliente
 
 ---
 
-## 6. Próximos Passos Recomendados
+## 6. Próximos Passos
 
-1. **Abrir o `.xlsx`** e validar este documento contra a estrutura real
-2. **Atualizar este arquivo** com os dados confirmados, removendo o marcador "Pendente"
-3. Se houver divergências, criar uma seção `## Correções` no final deste documento com o que mudou
-4. Quando integrado ao agente, versionar este arquivo junto com qualquer mudança no esquema da base
+1. ~~Abrir o `.xlsx` e validar~~ ✅ Concluído em 29/08
+2. ~~Atualizar este arquivo~~ ✅ Concluído
+3. ~~Seção `## Correções`~~ ✅ Abaixo
+
+---
+
+## Correções
+
+| # | Item documentado antes | Real confirmado |
+|---|---|---|
+| 1 | Aba principal chamada `Dados` (inferido) | Aba chama-se **`PEDIDOS`** |
+| 2 | `VALOR` possivelmente unitário | **Total da linha** (BRL) |
+| 3 | Nulos possíveis em `BARCODE`, `MARCA`, `REF` | **Nenhum nulo** em nenhuma coluna |
+| 4 | "Média de pedidos por cliente ~10 (120/12)" | Média exata 10,0 (min 5, max 15) |
+| 5 | `LEIA_ME` com instruções genéricas | 6 linhas × 2 colunas (`CAMPO`/`DESCRICAO`), incluindo a linha "Uso para IA" |
