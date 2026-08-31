@@ -310,6 +310,7 @@ Pipeline CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — 3/3 verd
 | [`docs/qa/`](docs/qa/README.md) | Code review + cobertura 95 % + matriz de risco (6 cenários) |
 | [`docs/evidencias/`](docs/evidencias/README.md) | Logs, traces, métricas, screenshots — índice de todas as evidências |
 | [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md) | Reprodução completa do fluxo Flowise + Discord |
+| [`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md) | Roteiro detalhado do vídeo de demonstração (timestamps, falas, comandos curl, checklist) |
 | [`docs/estrutura_planilha.md`](docs/estrutura_planilha.md) | Estrutura confirmada da base xlsx |
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | Pipeline CI (ruff → pytest → wheel) |
 
@@ -318,4 +319,5 @@ Pipeline CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — 3/3 verd
 ## 13. Vídeo de demonstração
 
 > 🚧 **Link será inserido aqui** após a gravação e upload no YouTube como **não listado**.
-> Roteiro sugerido (≤ 12 min): 0–1 min problema e classificação · 1–2 min arquitetura · 2–4 min cenários (principal + adversarial) · 4–5 min segurança · 5–6 min QA · 6–8 min pipeline/anomalia/risco · 8–9 min low-code Flowise → Discord · 9–10 min limitações e melhorias futuras.
+> Roteiro detalhado com timestamps, falas, comandos `curl` prontos e checklist pré-gravação: [`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md).
+> Estrutura (≤ 12 min): 0–1 min problema e classificação · 1–2 min arquitetura · 2–4 min cenários (principal + adversarial) · 4–5 min segurança · 5–6 min QA · 6–8 min pipeline/anomalia/risco · 8–9 min low-code Flowise → Discord · 9–10 min limitações e melhorias futuras.
