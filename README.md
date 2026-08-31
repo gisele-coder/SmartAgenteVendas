@@ -342,6 +342,4 @@ Pipeline CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — 3/3 verd
 
 ## 13. Vídeo de demonstração
 
-> 🚧 **Link será inserido aqui** após a gravação e upload no YouTube como **não listado**.
-> Roteiro detalhado com timestamps, falas, comandos `curl` prontos e checklist pré-gravação: [`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md).
-> Estrutura (≤ 12 min): 0–1 min problema e classificação · 1–2 min arquitetura · 2–4 min cenários (principal + adversarial) · 4–5 min segurança · 5–6 min QA · 6–8 min pipeline/anomalia/risco · 8–9 min low-code Flowise → Discord · 9–10 min limitações e melhorias futuras.
+Video Apresentação: https://youtu.be/2WuUHBAZUiY
