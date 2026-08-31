@@ -1,0 +1,214 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>evidencias | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/evidencias/README.md</span><span>· <a href="../../index.html">início</a></span></nav><hr />
+<p>origem: convenção definida pelo brief do projeto (seção 5.4)
+status: placeholder
+data: 2026-08-27
+finalidade: concentrar artefatos comprobatórios de execução (logs, traces, métricas, screenshots)
+relacionado: <a href="../index.html">../README.md</a></p>
+<hr />
+<h1 id="evidencias">Evidências</h1>
+<p>Esta pasta concentra <strong>artefatos comprobatórios de execução</strong> do projeto, conforme exigido pelo brief (seções 4.6, 4.7, 4.8) e pela convenção de organização do <code>docs/</code> (seção 5.4).</p>
+<hr />
+<h2 id="finalidade">Finalidade</h2>
+<ul>
+<li>Armazenar <strong>logs estruturados</strong>, traces, métricas e registros de auditoria</li>
+<li>Servir como insumo para análise de <strong>anomalias, latência e taxa de erro</strong></li>
+<li>Sustentar a <strong>estimativa de tendência ou risco de falha</strong> (critério #13 do brief)</li>
+<li>Disponibilizar <strong>evidências objetivas</strong> para reconstrução de execuções (critério #11)</li>
+</ul>
+<hr />
+<h2 id="estrutura-sugerida">Estrutura Sugerida</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo / Pasta</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>README.md</code></td>
+<td>Este arquivo — visão geral da pasta</td>
+</tr>
+<tr>
+<td><code>execucoes/</code></td>
+<td>Logs e traces de execuções representativas da aplicação</td>
+</tr>
+<tr>
+<td><code>pipeline/</code></td>
+<td>Evidências do pipeline de CI (lint, testes, build)</td>
+</tr>
+<tr>
+<td><code>anomalias/</code></td>
+<td>Anomalias detectadas e suas análises</td>
+</tr>
+<tr>
+<td><code>metricas/</code></td>
+<td>Séries de métricas, tendências e estimativas de risco</td>
+</tr>
+<tr>
+<td><code>screenshots/</code></td>
+<td>Capturas de tela da aplicação, dashboards, fluxos low-code</td>
+</tr>
+<tr>
+<td><code>seguranca/</code></td>
+<td>Evidências de cenários adversariais e bloqueios</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="indice-de-evidencias-arquivadas">Índice de Evidências Arquivadas</h2>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Evidência</th>
+<th>Fase</th>
+<th>Arquivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>29/08</td>
+<td>Execução real E2E do grafo (<code>e2e-real-001</code>) — cliente 100011, padrão climatização</td>
+<td>2</td>
+<td><a href="execucoes/e2e-real-001-fase-2.html"><code>execucoes/e2e-real-001-fase-2.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>Smoke test HTTP da API (<code>668b104164e6</code>) — uvicorn + curl, LLM real</td>
+<td>3</td>
+<td><a href="execucoes/api-668b104164e6-fase-3.html"><code>execucoes/api-668b104164e6-fase-3.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>Cenários adversariais (injection + ação destrutiva) bloqueados via HTTP com audit correlacionado</td>
+<td>4</td>
+<td><a href="seguranca/adversarial-fase-4.html"><code>seguranca/adversarial-fase-4.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>3 execuções com logs JSON + métricas + audit correlacionados (<code>/metrics</code> capturado)</td>
+<td>5</td>
+<td><a href="execucoes/observabilidade-fase-5.html"><code>execucoes/observabilidade-fase-5.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>Pipeline 3/3 etapas com análise da IA de cada estágio</td>
+<td>7</td>
+<td><a href="pipeline/pipeline-local-2026-08-29.html"><code>pipeline/pipeline-local-2026-08-29.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>Anomalia linear de latência da tool (detecção run 5, causa isolada)</td>
+<td>7</td>
+<td><a href="anomalias/anomalia-tool-latency-2026-08-29.html"><code>anomalias/anomalia-tool-latency-2026-08-29.md</code></a></td>
+</tr>
+<tr>
+<td>29/08</td>
+<td>Estimativa de tendência (regressão) e risco de falha (SLA)</td>
+<td>7</td>
+<td><a href="metricas/tendencia-risco-2026-08-29.html"><code>metricas/tendencia-risco-2026-08-29.md</code></a></td>
+</tr>
+<tr>
+<td>31/08</td>
+<td>E2E Flowise + Discord (Parte 8) — injection → <code>flowise_notify</code> → Agentflow V2 (<code>poolside/laguna-s-2.1</code>) → webhook Discord HTTP 204, todos os sinais correlacionados por <code>request_id</code></td>
+<td>8</td>
+<td><a href="execucoes/flowise-discord-e2e-fase-8.html"><code>execucoes/flowise-discord-e2e-fase-8.md</code></a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quando-popular">Quando Popular</h2>
+<p>Esta pasta deve começar a ser preenchida assim que:</p>
+<ol>
+<li>Houver <strong>logs estruturados</strong> sendo emitidos pela aplicação</li>
+<li>Pelo menos uma <strong>execução completa</strong> for registrada com sinais correlacionáveis</li>
+<li>Uma <strong>anomalia real ou simulada</strong> for detectada e documentada</li>
+<li>O <strong>pipeline de CI</strong> começar a gerar artefatos verificáveis</li>
+<li>Um <strong>cenário adversarial</strong> for executado e bloqueado (seção 4.5)</li>
+</ol>
+<hr />
+<h2 id="modelo-de-analise-de-execucao">Modelo de Análise de Execução</h2>
+<p>Cada entrada em <code>execucoes/</code> pode seguir este padrão:</p>
+<pre><code class="language-markdown"># Execução — &lt;request_id&gt;
+
+## Sinais Coletados
+- **Logs estruturados:** &lt;caminho ou anexo&gt;
+- **Métricas:** &lt;caminho ou anexo&gt;
+- **Trace:** &lt;caminho ou anexo&gt;
+
+## Fluxo Percorrido
+1. &lt;node 1&gt;
+2. &lt;node 2&gt;
+...
+
+## Decisões Relevantes
+- &lt;decisão X no node Y&gt;
+
+## Erros e Latência
+- &lt;erro ou gargalo observado&gt;
+
+## Conclusão da Análise
+- &lt;o que foi aprendido, ação corretiva, se houver&gt;
+</code></pre>
+<hr />
+<h2 id="modelo-de-analise-de-anomalia">Modelo de Análise de Anomalia</h2>
+<p>Cada entrada em <code>anomalias/</code> pode seguir este padrão:</p>
+<pre><code class="language-markdown"># Anomalia — &lt;data ou referência&gt;
+
+## Sintoma
+- &lt;descrição do comportamento anômalo&gt;
+
+## Evidência Bruta
+- &lt;logs, métricas, screenshots&gt;
+
+## Análise da IA
+- &lt;interpretação automatizada dos sinais&gt;
+
+## Causa Provável
+- &lt;hipótese fundamentada&gt;
+
+## Ação Corretiva
+- &lt;o que foi feito&gt;
+- &lt;resultado após correção&gt;
+</code></pre>
+<hr />
+<h2 id="boas-praticas">Boas Práticas</h2>
+<ul>
+<li><strong>Nunca</strong> versionar segredos, tokens ou dados sensíveis em logs</li>
+<li><strong>Sempre</strong> usar <code>request_id</code> para correlacionar sinais de uma mesma execução</li>
+<li><strong>Versionar</strong> os artefatos no Git sempre que representarem uma análise fechada</li>
+<li><strong>Limitar tamanho</strong> dos arquivos — preferir amostras representativas a logs completos</li>
+</ul>
+<hr />
+<h2 id="referencias">Referências</h2>
+<ul>
+<li>Brief: <a href="../Projeto_Avaliativo_modulo_2.html"><code>../Projeto_Avaliativo_modulo_2.md</code></a> — seções 4.6, 4.7, 4.8 e 6.5</li>
+<li>Correlação com QA: <a href="../qa/index.html"><code>../qa/</code></a></li>
+<li>Índice geral: <a href="../index.html"><code>../README.md</code></a></li>
+</ul></main></body></html>

@@ -1,0 +1,92 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-3-api-memoria | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-3-api-memoria.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 3 — API FastAPI + Memória</p>
+<hr />
+<h1 id="fase-3-api-fastapi-memoria">Fase 3 — API FastAPI + Memória</h1>
+<blockquote>
+<p>Objetivo: expor o agente como API local com contrato estruturado, <code>request_id</code> por execução e memória de curto prazo via checkpointer (brief 4.4).</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li><strong>Aprovação de continuidade:</strong><blockquote>
+<p>"sim" — aprovação da execução da Parte 3 conforme plano (<code>docs/plano-execucao.md</code>), com a regra permanente de registro de prompts por fase</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="implementacao">Implementação</h3>
+<ul>
+<li><code>app/main.py</code>: <code>POST /recomendacoes</code> (request/response Pydantic), <code>GET /health</code> com modelo vigente; <strong>injeção de dependência</strong> do LLM (<code>Annotated[ChatOpenAI, Depends(get_llm_service)]</code>) — permite override nos testes sem rede nem custo; <code>request_id</code> = <code>uuid4().hex[:12]</code> por execução</li>
+<li><code>app/graph/builder.py</code>: <code>graph.compile(checkpointer=MemorySaver())</code>; <code>run_recommendation</code> usa <code>thread_id = "customer-&lt;id&gt;"</code> — <strong>memória por cliente</strong> entre execuções (brief 4.4: checkpointer)</li>
+<li><code>app/graph/nodes.py</code>: <code>validate_input</code> captura as recomendações da execução anterior <strong>antes</strong> de sobrescrever → <code>previous_recommendations</code> (memória demonstrável na API); campos voláteis (<code>errors</code>, <code>fallback_used</code>) resetados a cada execução para evitar vazamento entre chamadas do mesmo thread</li>
+<li><code>app/schemas.py</code>: <code>RecommendationResponse</code> ganhou <code>previous_recommendations</code> e <code>reason</code> (motivo do bloqueio)</li>
+</ul>
+<h3 id="bugscorrecoes-durante-a-execucao">Bugs/correções durante a execução</h3>
+<ol>
+<li><code>RecommendationResponse</code> descartava o campo <code>reason</code> do bloqueio (response_model filtra campos não declarados) → campo <code>reason</code> adicionado ao contrato</li>
+<li>Artefato de digitação em <code>schemas.py</code> (<code>default_factory=dict if False else list</code>) corrigido no mesmo ciclo</li>
+<li><code>test_health</code> atualizado para o novo contrato do <code>/health</code> (inclui <code>model</code>)</li>
+</ol>
+<h3 id="justificativa-da-estrategia-de-memoria-brief-44">Justificativa da estratégia de memória (brief 4.4)</h3>
+<ul>
+<li><strong>Memória de curto prazo</strong>: <code>MemorySaver</code> (checkpointer em memória) com thread por cliente — persiste estado entre execuções e habilita <code>previous_recommendations</code></li>
+<li><strong>Contexto externo</strong>: histórico de pedidos + coocorrência via tools (fonte xlsx), documentado no README e <code>system.md</code></li>
+<li>RAG vetorial não é necessário no domínio atual (base pequena, consulta por cliente); registrado como evolução futura</li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>24 passed</strong> (7 novos em <code>test_api.py</code>: integração HTTP, memória entre chamadas, injection via API, cliente inexistente, 422, fallback via API)</td>
+</tr>
+<tr>
+<td>Lint</td>
+<td><code>ruff check .</code> → All checks passed</td>
+</tr>
+<tr>
+<td>Smoke real</td>
+<td>uvicorn + <code>curl</code>: <code>POST /recomendacoes</code> → 200 com JSON completo e justificativas do LLM real — registrado em <a href="../../evidencias/execucoes/api-668b104164e6-fase-3.html"><code>docs/evidencias/execucoes/api-668b104164e6-fase-3.md</code></a></td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/api-memoria</code></td>
+</tr>
+</tbody>
+</table></main></body></html>

@@ -1,0 +1,105 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>relatorio-cobertura-2026-08-29 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/qa/relatorios/relatorio-cobertura-2026-08-29.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="relatorio-de-cobertura-29082026">Relatório de Cobertura — 29/08/2026</h1>
+<p><strong>Suite:</strong> 42 testes · <strong>Ferramenta:</strong> pytest-cov · <strong>Branch:</strong> <code>feature/qa-inteligente</code> (após correção A1 do code review)</p>
+<h2 id="sumario">Sumário</h2>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Cobertura total</strong></td>
+<td><strong>95%</strong> (451 stmts, 24 misses)</td>
+</tr>
+<tr>
+<td>Módulos com 100%</td>
+<td>14 (config, builder, metrics, audit, guard, orders, schemas, state, llm, prompts...)</td>
+</tr>
+<tr>
+<td>Menor cobertura</td>
+<td><code>observability/logging_config.py</code> 82%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="detalhamento">Detalhamento</h2>
+<pre><code>Name                                  Stmts   Miss  Cover
+---------------------------------------------------------
+app\__init__.py                           0      0   100%
+app\config.py                            15      0   100%
+app\graph\builder.py                     54      0   100%   ← +branch de exceção (A1)
+app\graph\nodes.py                      137      9    93%
+app\graph\prompts.py                      6      0   100%
+app\graph\state.py                        3      0   100%
+app\llm.py                                4      0   100%
+app\main.py                              28      3    89%
+app\observability\logging_config.py      40      7    82%
+app\observability\metrics.py             37      0   100%
+app\schemas.py                           14      0   100%
+app\security\audit.py                    12      0   100%
+app\security\guard.py                    16      0   100%
+app\tools\loader.py                      23      3    87%
+app\tools\orders.py                      21      0   100%
+app\tools\schemas.py                     19      0   100%
+app\tools\similar.py                     22      2    91%
+---------------------------------------------------------
+TOTAL                                   451     24    95%
+</code></pre>
+<h2 id="lacunas-conhecidas-aceitas-com-justificativa">Lacunas conhecidas (aceitas, com justificativa)</h2>
+<table>
+<thead>
+<tr>
+<th>Módulo</th>
+<th>Linhas não cobertas</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logging_config.py</code> (82%)</td>
+<td>Setup de FileHandler/StreamHandler</td>
+<td>Exige ambiente de execução real (uvicorn); validado manualmente na evidência da fase 5</td>
+</tr>
+<tr>
+<td><code>nodes.py</code> (93%)</td>
+<td>Ramificações de erro extremas (ex.: <code>history</code> vazio + <code>similar</code> vazio)</td>
+<td>Caminho de fallback vazio coberto indiretamente; baixo risco</td>
+</tr>
+<tr>
+<td><code>main.py</code> (89%)</td>
+<td>Handler de exceção 500</td>
+<td>Requer falha interna simulada no endpoint; comportamento do grafo já coberto</td>
+</tr>
+<tr>
+<td><code>loader.py</code> (87%)</td>
+<td>Branches de <code>FileNotFoundError</code>/<code>ValueError</code></td>
+<td>Coberto por <code>test_base_ausente_erro_claro</code> (FileNotFound); aba ausente aceita</td>
+</tr>
+</tbody>
+</table></main></body></html>

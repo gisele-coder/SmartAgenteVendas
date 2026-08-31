@@ -1,0 +1,113 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-1-dados-tools | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-1-dados-tools.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 1 — Dados + Tools</p>
+<hr />
+<h1 id="fase-1-dados-tools">Fase 1 — Dados + Tools</h1>
+<blockquote>
+<p>Objetivo: transformar a planilha em fonte de dados validada das tools do agente, resolvendo as lacunas documentadas em <code>estrutura_planilha.md</code>.</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li>
+<p><strong>Aprovação de continuidade (contexto da conversa):</strong></p>
+<blockquote>
+<p>"ok" — aprovação da execução da Parte 0 e do plano como um todo, incluindo a Parte 1 (tools <code>get_customer_orders</code> + <code>find_similar_products</code> com validação Pydantic e tratamento de erros)</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Instrução de processo incorporada ao fluxo:</strong></p>
+<blockquote>
+<p>"Preciso que já salvando os prompts de cada fase desenvolvida para comprovação do trabalho antes de prosseguir."
+   (aplicada: este arquivo é registrado antes do início da Parte 2)</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="confirmacao-da-estrutura-da-planilha-inspecao-programatica-com-pandas">Confirmação da estrutura da planilha (inspeção programática com pandas)</h3>
+<ul>
+<li>Abas: <code>PEDIDOS</code> (343×12) e <code>LEIA_ME</code> (6×2) — <strong>a aba principal chama-se <code>PEDIDOS</code></strong>, não <code>Dados</code></li>
+<li>Estatísticas confirmadas: 120 pedidos, 12 clientes, 22 produtos, zero nulos, sem coluna de data</li>
+<li>Pedidos por cliente: min 5, max 15, média 10,0</li>
+<li><strong><code>VALOR</code> = total da linha</strong>: evidência analítica — <code>VALOR/QTD</code> resulta sempre em preços unitários terminando em <code>.9</code> (ex.: 29,8/2 = 14,9; 399,0/10 = 39,9; 1677,9/21 = 79,9)</li>
+<li>Esquema plano: 1 linha = 1 item; sem duplicatas <code>PEDIDO+COD_PROD</code></li>
+</ul>
+<h3 id="decisoes-de-implementacao">Decisões de implementação</h3>
+<ul>
+<li><code>loader.py</code>: carregamento único com <code>lru_cache</code>, validação do esquema esperado (12 colunas + aba), erros traduzidos para <code>RuntimeError</code> com mensagem clara (base ausente / aba ausente / colunas ausentes)</li>
+<li><code>schemas.py</code>: contratos Pydantic (<code>OrderItem</code>, <code>CustomerOrders</code>, <code>SimilarProduct</code>) — saída estruturada já na camada de dados (seção 4.3 do brief)</li>
+<li><code>orders.py</code>: <code>get_customer_orders</code> (rejeita <code>customer_id</code> não positivo), <code>customer_exists</code> (para o node <code>validate_input</code> da Parte 2)</li>
+<li><code>similar.py</code>: coocorrência — produtos que aparecem nos pedidos do cliente e que ele <strong>ainda não comprou</strong>; <code>confidence = coocorrência / total de pedidos do cliente</code> (limitado a 1,0)</li>
+<li>Testes com a base real commitada (pequena, determinística) + teste de base ausente com <code>monkeypatch</code> + <code>cache_clear</code></li>
+</ul>
+<h3 id="correcao-durante-a-execucao">Correção durante a execução</h3>
+<ul>
+<li>Ruff <code>E501</code> (linha &gt; 100) em <code>schemas.py</code> — descrição de campo encurtada; re-run: all checks passed</li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>11 passed</strong> (9 novos em <code>test_tools.py</code>)</td>
+</tr>
+<tr>
+<td>Lint</td>
+<td><code>ruff check .</code> → All checks passed</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/tool-dados</code> (fluxo develop → feature, seção 5.4 do brief)</td>
+</tr>
+<tr>
+<td>Doc atualizado</td>
+<td><code>docs/estrutura_planilha.md</code> — lacunas marcadas como resolvidas + seção <code>## Correções</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="correcoes-posteriores-registradas-na-fase-2">Correções Posteriores (registradas na fase 2)</h2>
+<p>Durante a integração do grafo (fase 2), descobriu-se que:</p>
+<ol>
+<li><strong>A coocorrência implementada nesta fase tinha um bug de lógica</strong>: olhava apenas os pedidos do próprio cliente — onde todo item já é dele — retornando sempre <code>[]</code>, para todos os clientes.</li>
+<li><strong>Dois testes desta fase eram vacuos</strong> (<code>test_coocorrencia_exclui_produtos_ja_comprados</code> e <code>test_fallback...</code>): asserts sobre listas vazias passavam sem testar nada.</li>
+</ol>
+<p><strong>Correção aplicada na fase 2</strong>: lógica <em>market-basket</em> (pedidos de qualquer cliente contendo produtos do perfil) + asserts de não-vazio. Detalhes completos em <a href="fase-2-langgraph.html"><code>fase-2-langgraph.md</code></a>.</p>
+<blockquote>
+<p>Nota metodológica: o registro honesto do erro e da correção é parte das evidências de desenvolvimento (critérios 12 e 15 do brief).</p>
+</blockquote></main></body></html>

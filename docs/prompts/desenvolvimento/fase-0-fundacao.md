@@ -27,7 +27,7 @@ fase: 0 — Fundação
    (verificado: repo `gisele-coder/SmartAgenteVendas`, 1 commit na `main`; criada branch `develop`)
 
 4. **Fornecimento da chave e solicitação de configuração:**
-   > "Minha api key é a sk-bDpf...VUqH7mB do opencode, já pode adicionar a config temporária"
+   > "Foi fornecida uma chave de API do OpenCode para configuração temporária (valor omitido por segurança)."
 
 5. **Aprovação da execução da Parte 0:**
    > "sim"

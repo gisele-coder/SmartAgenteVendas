@@ -1,0 +1,105 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-6-qa | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-6-qa.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 6 — QA Inteligente</p>
+<hr />
+<h1 id="fase-6-qa-inteligente">Fase 6 — QA Inteligente</h1>
+<blockquote>
+<p>Objetivo: aplicar IA em revisão de código de alteração real, consolidar testes (incluindo integração/E2E) e priorizar por risco (brief 4.7).</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li>
+<p><strong>Instrução de processo (usuário):</strong></p>
+<blockquote>
+<p>"De o commit antes e atualize os prompts e documentação antes de continuar"
+   (aplicada duas vezes — varredura de coerência documental antes de iniciar a fase; commits <code>1158ae9</code> e anteriores)</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Aprovação de continuidade</strong> para a Parte 6 conforme plano (<code>docs/plano-execucao.md</code>)</p>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="code-review-com-ia-de-diff-real-criterio-12">Code review com IA de diff real (critério 12)</h3>
+<ul>
+<li>Diff analisado: <code>git show 07fbd7f -- app/</code> (commit real da Parte 5 — observabilidade)</li>
+<li><strong>4 achados</strong>: 1 correção aplicada (A1), 2 aceitos com justificativa (A2 double-parse, A3 cópia rasa), 1 positivo (A4 padrões corretos)</li>
+<li><strong>A1 (corrigido)</strong>: falhas de invocação do grafo não entravam nas métricas — um pico de taxa de erro ficaria invisível no <code>/metrics</code>. Correção: <code>try/except</code> em <code>run_recommendation</code> registra <code>record_run("error", ...)</code> e relança; teste de regressão adicionado</li>
+<li>Documentado em <a href="../../qa/code-reviews/review-07fbd7f-observabilidade.html"><code>qa/code-reviews/review-07fbd7f-observabilidade.md</code></a></li>
+</ul>
+<h3 id="cobertura-e-relatorio">Cobertura e relatório</h3>
+<ul>
+<li><code>pytest --cov=app</code>: <strong>95% total</strong> (451 stmts / 24 misses), 14 módulos em 100%</li>
+<li>Lacunas restantes documentadas com justificativa (setup de handlers reais, branches extremos)</li>
+<li>Relatório arquivado: <a href="../../qa/relatorios/relatorio-cobertura-2026-08-29.html"><code>qa/relatorios/relatorio-cobertura-2026-08-29.md</code></a></li>
+</ul>
+<h3 id="priorizacao-por-risco-criterio-12">Priorização por risco (critério 12)</h3>
+<ul>
+<li>Matriz com 6 cenários (impacto × probabilidade × risco)</li>
+<li><strong>Prioridade 1</strong>: acesso indevido a dados de outros clientes via prompt injection — impacta privacidade e é requisito explícito do brief; testes asserem <code>llm.calls == 0</code></li>
+<li>Prioridade 2: LLM fora do contrato (probabilidade alta — ocorreu 3× em execução real)</li>
+<li>Arquivado em <a href="../../qa/priorizacao-risco.html"><code>qa/priorizacao-risco.md</code></a></li>
+</ul>
+<h3 id="tipos-de-teste-consolidados">Tipos de teste consolidados</h3>
+<ul>
+<li><strong>Unitários</strong>: tools, security, métricas, logs</li>
+<li><strong>Integração</strong>: HTTP (TestClient) → LangGraph → tools → base xlsx → contrato Pydantic</li>
+<li><strong>E2E real</strong>: evidências com uvicorn + LLM real (fases 3 e 5 arquivadas em <code>evidencias/</code>)</li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>42 passed</strong> (+1 teste de regressão A1) · cobertura 95%</td>
+</tr>
+<tr>
+<td>Lint</td>
+<td><code>ruff check .</code> → All checks passed</td>
+</tr>
+<tr>
+<td>Code review</td>
+<td>4 achados, 1 correção aplicada com teste</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/qa-inteligente</code></td>
+</tr>
+</tbody>
+</table></main></body></html>

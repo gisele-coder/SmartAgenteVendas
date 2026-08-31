@@ -1,0 +1,344 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CHANGELOG | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>CHANGELOG.md</span><span>· <a href="index.html">início</a></span></nav><h1 id="changelog-smartorder-ai">Changelog — SmartOrder AI</h1>
+<blockquote>
+<p>Registro do desenvolvimento por fase (Partes 0-9), estado atual e roadmap.
+Fonte viva do plano: <a href="docs/plano-execucao.html"><code>docs/plano-execucao.md</code></a> · Evidências por fase: <a href="docs/prompts/desenvolvimento/index.html"><code>docs/prompts/desenvolvimento/</code></a></p>
+</blockquote>
+<hr />
+<h2 id="estado-de-entrega-3108">📦 Estado de Entrega (31/08)</h2>
+<blockquote>
+<p>Snapshot vivo do que está pronto para a entrega acadêmica (15h) e o que falta fazer.</p>
+</blockquote>
+<h3 id="pronto-ja-no-origindevelop-commit-2b24511-mais-o-roteiro-00be4b3">✅ Pronto — já no <code>origin/develop</code> (commit <code>2b24511</code> mais o roteiro <code>00be4b3</code>)</h3>
+<p><strong>Partes 0–8</strong> (todas concluídas, commitadas e pushadas na <code>develop</code>):</p>
+<ul>
+<li>[x] <strong>Parte 0</strong> — Fundação (<code>58d76b5</code>) · scaffold, <code>.gitignore</code>, LLM por env</li>
+<li>[x] <strong>Parte 1</strong> — Dados + Tools (<code>a999dbc</code>) · <code>get_customer_orders</code> + coocorrência</li>
+<li>[x] <strong>Parte 2</strong> — Núcleo LangGraph (<code>b76db1d</code>) · 8 nodes, paralelização, DAG</li>
+<li>[x] <strong>Parte 3</strong> — API + Memória (<code>24ff625</code>) · FastAPI + <code>MemorySaver</code></li>
+<li>[x] <strong>Parte 4</strong> — Segurança (<code>2c3396d</code>) · injection + autonomia + audit JSONL</li>
+<li>[x] <strong>Parte 5</strong> — Observabilidade (<code>448e233</code>) · logs + <code>/metrics</code> + audit correlacionado</li>
+<li>[x] <strong>Parte 6</strong> — QA com IA (<code>f5e9001</code>) · code review + cobertura 95% + matriz de risco</li>
+<li>[x] <strong>Parte 7</strong> — DevOps (<code>0f4fb80</code>) · CI 3/3 + anomalia + risco ALTO (SLA 2s)</li>
+<li>[x] <strong>Parte 8</strong> — Flowise Low-Code (<code>0dc052c</code> app + <code>87960dc</code> evidence) · Agentflow V2 → Discord (request_id <code>3bfceacea49f</code>, HTTP 204)</li>
+</ul>
+<p><strong>Parte 9 — já prontos (esperando apenas o link do vídeo):</strong></p>
+<ul>
+<li>[x] README final (checklist 5.2 do brief) — commit <code>f134187</code></li>
+<li>[x] Refinamento 3 (Chatflow → Agentflow V2) — commit <code>c258120</code> (critério 15)</li>
+<li>[x] Feature extra: <strong>recomendação por carrinho</strong> (<code>seed_products</code>) — commit <code>2b24511</code> (11 testes novos, 57 passed, 0 regressões)</li>
+<li>[x] Roteiro detalhado do vídeo de demonstração — commit <code>00be4b3</code> (<a href="docs/video/roteiro-video-fase-9.html"><code>docs/video/roteiro-video-fase-9.md</code></a>)</li>
+<li>[x] Critérios do brief atendidos — 15/15 (rastreabilidade em <a href="docs/plano-execucao.html"><code>docs/plano-execucao.md</code></a> § 3)</li>
+<li>[x] Segurança: <code>.env</code> gitignored · credencial <strong>nunca</strong> commitada (validado por grep nos 3 commits da Parte 8/9)</li>
+</ul>
+<p><strong>Qualidade atual:</strong>
+- Ruff limpo
+- <strong>57 testes passados</strong> (46 anteriores + 11 do carrinho)
+- 1 falha pré-existente em <code>test_llm_smoke</code> (gateway OpenCode não suporta mais <code>hy3-free</code> — fora do escopo deste commit; documentado)
+- Branch <code>develop</code> 6 commits à frente da <code>main</code>; <code>main</code> intacta (1 commit original <code>0cabd3c</code>)</p>
+<h3 id="falta-para-fechar-a-entrega-ordem-sugerida">⬜ Falta para fechar a entrega — ordem sugerida</h3>
+<ol>
+<li>[ ] <strong>Gravar o vídeo</strong> ≤ 12 min seguindo <a href="docs/video/roteiro-video-fase-9.html"><code>docs/video/roteiro-video-fase-9.md</code></a>
+   - [ ] Upload no YouTube como <strong>não listado</strong>
+   - [ ] Copiar o link e atualizar <code>README.md</code> seção 13 (substituir o placeholder 🚧 pelo link)</li>
+<li>[ ] <strong>Commit do link</strong> <code>docs: adiciona link do vídeo de demonstração</code> → push na <code>develop</code></li>
+<li>[ ] <strong>Merge</strong> <code>develop</code> → <code>main</code> (PR pode ser local — <code>git checkout main &amp;&amp; git merge --no-ff develop</code>)</li>
+<li>[ ] <strong>Convidar o professor como colaborador</strong> no GitHub (Settings → Collaborators)</li>
+<li>[ ] <strong>Submeter no AVA</strong> (Projeto Avaliativo – M2.2):
+   - Link do repositório (<code>https://github.com/gisele-coder/SmartAgenteVendas</code>)
+   - Link do quadro Kanban
+   - Link do vídeo (YouTube não listado)</li>
+<li>[ ] <strong>Atualizar o Kanban</strong> (mover cards 8 e 9 para "Concluído")</li>
+<li>[ ] <strong>Não alterar o repositório após 15h</strong> (regra do brief § 7)</li>
+</ol>
+<h3 id="pos-entrega-seguranca-obrigatorio">🛑 Pós-entrega — segurança (obrigatório)</h3>
+<ul>
+<li>[ ] <strong>Revogar/rotacionar a API key OpenCode</strong> (<code>LLM_API_KEY</code>, exposta no chat)</li>
+<li>[ ] <strong>Rotacionar o webhook do Discord</strong> (a URL circulou no chat)</li>
+<li>[ ] <strong>Rotacionar/limpar a API key do Flowise</strong> (este projeto não usou — var vazia no <code>.env</code>, mas vale verificar no Dashboard → API Keys)</li>
+</ul>
+<h3 id="resumo-de-criterios-do-brief">📊 Resumo de critérios do brief</h3>
+<table>
+<thead>
+<tr>
+<th>Critério</th>
+<th>Status</th>
+<th>Artefato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 — Vídeo ≤12 min, YouTube não listado</td>
+<td>⬜ pendente</td>
+<td>roteiro pronto; gravar e subir</td>
+</tr>
+<tr>
+<td>2 — Cards no quadro com descrições</td>
+<td>✅</td>
+<td>Kanban</td>
+</tr>
+<tr>
+<td>3 — Quadro atualizado durante o desenvolvimento</td>
+<td>✅</td>
+<td>histórico</td>
+</tr>
+<tr>
+<td>4 — Branches, commits semânticos, develop→feature→main</td>
+<td>✅</td>
+<td>9+ feature branches; commits descritivos</td>
+</tr>
+<tr>
+<td>5 — README completo e reproduzível</td>
+<td>✅</td>
+<td><code>README.md</code> (seção 5.2)</td>
+</tr>
+<tr>
+<td>6 — App funcional, 2 cenários, saída estruturada</td>
+<td>✅</td>
+<td>API + JSON Pydantic</td>
+</tr>
+<tr>
+<td>7 — LangGraph: state, nodes, sequencial+condicional+paralelo, parada</td>
+<td>✅</td>
+<td><code>app/graph/</code> 8 nodes, DAG</td>
+</tr>
+<tr>
+<td>8 — Tool integrada com validação e tratamento de falhas</td>
+<td>✅</td>
+<td><code>app/tools/</code></td>
+</tr>
+<tr>
+<td>9 — Memória/contexto adequada</td>
+<td>✅</td>
+<td><code>MemorySaver</code> + histórico via tool</td>
+</tr>
+<tr>
+<td>10 — Segurança, autonomia, cenário adversarial</td>
+<td>✅</td>
+<td><code>app/security/</code> + evidência</td>
+</tr>
+<tr>
+<td>11 — 2 sinais de observabilidade + timeout/retry/fallback</td>
+<td>✅</td>
+<td>logs + <code>/metrics</code> + audit JSONL</td>
+</tr>
+<tr>
+<td>12 — IA em code review + testes (integração/aceitação/E2E) + risco</td>
+<td>✅</td>
+<td><code>docs/qa/</code></td>
+</tr>
+<tr>
+<td>13 — Pipeline + IA + anomalia + estimativa de risco</td>
+<td>✅</td>
+<td>CI + evidências + projeção</td>
+</tr>
+<tr>
+<td>14 — Low-code integrado com trigger e saída observável</td>
+<td>✅</td>
+<td>Flowise Agentflow V2 + Discord</td>
+</tr>
+<tr>
+<td>15 — Refinamento documentado (problema→alteração→resultado)</td>
+<td>✅</td>
+<td>3 ciclos em <code>docs/prompts/refinamentos/</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="080-parte-8-flowise-low-code">[0.8.0] — Parte 8: Flowise Low-Code — ✅</h2>
+<h3 id="feito">Feito</h3>
+<ul>
+<li><strong>App-side</strong> (mergeada em <code>0dc052c</code>): <code>app/integrations/flowise.py</code> com <code>notify_flowise()</code> via httpx — chamada <strong>best-effort</strong> (timeout <code>flowise_timeout_s</code>, exceção engolida, resposta da API preservada), ativada por <code>FLOWISE_ALERTS_ENABLED=true</code></li>
+<li>Eventos emitidos em <code>run_recommendation</code>: <code>security_blocked</code> (risco <code>high</code> p/ injection, <code>medium</code> p/ autonomia) e <code>recommendation_generation_failed</code> (fallback do LLM)</li>
+<li>5 testes novos com HTTP mockado (<code>tests/test_flowise.py</code>) — habilitação, payload, erro engolido, auth opcional</li>
+<li><strong>Fluxo low-code (Agentflow V2)</strong> no Flowise Cloud: <code>Start → LLM (poolside/laguna-s-2.1 via OpenRouter, temp 0,2) → Custom Function</code> (axios → webhook Discord); prompt SRE no System Message; webhook em variável <code>DISCORD_WEBHOOK_URL</code> (Dashboard → Variables, <strong>não</strong> via node Set Variable)</li>
+<li>Export JSON <strong>sem segredos</strong> versionado em <a href="docs/lowcode/flowise-flow.json"><code>docs/lowcode/flowise-flow.json</code></a> (3 nodes, 2 edges; grep <code>discord.com/api/webhooks/[0-9]</code>, <code>sk-or</code>, <code>Bearer</code>: 0 matches)</li>
+<li><strong>Demo E2E real</strong> (request_id <code>3bfceacea49f</code>): injection → <code>security_check</code> (0,1 ms) → <code>flowise_notify</code> (6,7 s, Flowise HTTP 200) → Agentflow classifica <code>SEVERIDADE: alta / CAUSA PROVÁVEL: ... / AÇÃO RECOMENDADA: ...</code> → Discord HTTP 204. Total 10,1 s · três sinais correlacionados (logs/audit/metrics)</li>
+<li>Documentação: passo 2 de <a href="docs/lowcode/reproducao-flowise.html"><code>docs/lowcode/reproducao-flowise.md</code></a> reescrito com roteiro item-a-item (usuário não conhecia Flowise); evidência em <a href="docs/evidencias/execucoes/flowise-discord-e2e-fase-8.html"><code>docs/evidencias/execucoes/flowise-discord-e2e-fase-8.md</code></a>; screenshots em <code>docs/evidencias/screenshots/</code></li>
+<li>Decisões: N8N trial expirou → <strong>Flowise</strong> (aprovação do professor) → <strong>OpenRouter</strong> (sem integração OpenCode no Flowise Cloud) → <strong>Agentflow V2</strong> (Custom JS Function de Chatflow não aceita Chat Model — erro de JSON ao conectar)</li>
+<li><code>fase-8-lowcode.md</code> criado com prompts, resultado, lições e evidências</li>
+</ul>
+<hr />
+<h2 id="070-parte-7-devops-inteligente-0f4fb80">[0.7.0] — Parte 7: DevOps Inteligente — ✅ (<code>0f4fb80</code>)</h2>
+<ul>
+<li>CI GitHub Actions: Install → ruff → pytest+cobertura → wheel (+upload de artefato); <code>LLM_API_KEY</code> via Secret (smoke test pula sem key)</li>
+<li>Pipeline local 3/3 verdes; <strong>IA analisou logs dos 3 estágios</strong> (<code>evidencias/pipeline/</code>)</li>
+<li><strong>Anomalia real</strong>: série de 8 runs, degradação linear da tool (+300ms/run) detectada na run 5 — <code>evidencias/anomalias/</code></li>
+<li><strong>Estimativa de tendência/risco</strong>: regressão +178,8ms/run (global) / +300,2ms/run (conservador) → <strong>risco ALTO: SLA 2s violado em ~3 runs</strong> — <code>evidencias/metricas/</code></li>
+</ul>
+<h2 id="060-parte-6-qa-inteligente-f5e9001">[0.6.0] — Parte 6: QA Inteligente — ✅ (<code>f5e9001</code>)</h2>
+<ul>
+<li><strong>Code review com IA de diff real</strong> (<code>07fbd7f</code>): 4 achados honestos → <strong>A1 corrigido</strong> (falhas de invocação agora contam nas métricas) + teste de regressão</li>
+<li>Cobertura <strong>95%</strong> (42 passed) — <code>docs/qa/relatorios/</code></li>
+<li><strong>Priorização por risco</strong>: matriz de 6 cenários; prioridade 1 = acesso indevido a dados de outros clientes (<code>llm.calls == 0</code> nas asserções) — <code>docs/qa/priorizacao-risco.md</code></li>
+<li>Tipos de teste: unitários + integração (HTTP→grafo→tools→xlsx) + E2E real</li>
+</ul>
+<h2 id="050-parte-5-observabilidade-448e233">[0.5.0] — Parte 5: Observabilidade — ✅ (<code>448e233</code>)</h2>
+<ul>
+<li><strong>Sinal 1</strong>: logs JSON por node (<code>logs/execution.log</code>) com latência e contexto</li>
+<li><strong>Sinal 2</strong>: métricas thread-safe + endpoint <code>GET /metrics</code> (contadores, latências avg/max, block_rate, fallback_rate)</li>
+<li><strong>Sinal 3</strong>: audit JSONL (<code>logs/audit.jsonl</code>) — todos correlacionados por <code>request_id</code></li>
+<li>Investigação documentada: gargalo = LLM (98,8% da latência) — <code>evidencias/execucoes/observabilidade-fase-5.md</code></li>
+<li><code>tool_delay_ms</code> simulável (insumo das anomalias da Parte 7)</li>
+</ul>
+<h2 id="040-parte-4-seguranca-e-governanca-2c3396d">[0.4.0] — Parte 4: Segurança e Governança — ✅ (<code>2c3396d</code>)</h2>
+<ul>
+<li><code>app/security/guard.py</code>: injection (21 padrões) + ações destrutivas (15 padrões), normalização de acentos/caixa</li>
+<li><code>app/security/audit.py</code>: audit JSONL correlacionado por <code>request_id</code></li>
+<li><strong>Cenário adversarial real</strong>: 2 ataques via HTTP bloqueados sem acionar o LLM — <code>evidencias/seguranca/adversarial-fase-4.md</code></li>
+<li>Agente somente-leitura (limite de autonomia) · <strong>Refinamento 2</strong>: correlação do audit (checkpointer acumulava eventos → filtro por request_id)</li>
+</ul>
+<h2 id="030-parte-3-api-fastapi-memoria-24ff625">[0.3.0] — Parte 3: API FastAPI + Memória — ✅ (<code>24ff625</code>)</h2>
+<ul>
+<li><code>POST /recomendacoes</code> (contrato Pydantic completo: status, perfil, recomendações, <code>previous_recommendations</code>, <code>reason</code>)</li>
+<li><strong>Memória</strong>: <code>MemorySaver</code> com thread por cliente — 2ª chamada retorna recomendações anteriores (testado)</li>
+<li><code>request_id</code> UUID por execução · DI do LLM (<code>Depends</code>) — testes sem rede/custo</li>
+<li>Smoke real: uvicorn + curl → 200 com JSON completo — <code>evidencias/execucoes/api-668b104164e6-fase-3.md</code></li>
+</ul>
+<h2 id="020-parte-2-nucleo-langgraph-b76db1d">[0.2.0] — Parte 2: Núcleo LangGraph — ✅ (<code>b76db1d</code>)</h2>
+<ul>
+<li>State tipado com reducers (<code>operator.add</code>) · 8 nodes · fan-out/fan-in paralelo · edges condicionais · <strong>DAG sem ciclos</strong> (parada estrutural)</li>
+<li><code>SYSTEM_PROMPT</code> (6 regras incl. defesa injection + autonomia) documentado — <code>docs/prompts/system.md</code></li>
+<li>Fallback determinístico por coocorrência quando o LLM falha</li>
+<li>E2E real: <code>hy3-free</code> reproduziu o padrão semântico da base (ar-cond. → suporte) — <code>evidencias/execucoes/e2e-real-001-fase-2.md</code></li>
+<li>3 bugs corrigidos: coocorrência market-basket, tipagem <code>RunnableConfig</code>, max_tokens de reasoning → <strong>Refinamento 1</strong></li>
+</ul>
+<h2 id="010-parte-1-dados-tools-a999dbc">[0.1.0] — Parte 1: Dados + Tools — ✅ (<code>a999dbc</code>)</h2>
+<ul>
+<li>xlsx 100% confirmado (aba <code>PEDIDOS</code>, VALOR = total da linha, zero nulos) — <code>estrutura_planilha.md</code> atualizado</li>
+<li><code>get_customer_orders</code> + <code>find_similar_products</code> (coocorrência) com validação Pydantic e erros claros</li>
+<li>9 testes unitários (correção posterior da lógica market-basket registrada na fase 2)</li>
+</ul>
+<h2 id="001-parte-0-fundacao-58d76b5">[0.0.1] — Parte 0: Fundação — ✅ (<code>58d76b5</code>→)</h2>
+<ul>
+<li>Branch <code>develop</code>, <code>.gitignore</code> (<code>.env</code> protegido antes de tudo), scaffold <code>app/</code>+<code>tests/</code>, <code>pyproject.toml</code></li>
+<li>LLM configurado por env: gateway OpenCode, <strong><code>hy3-free</code></strong> (conta sem saldo → modelos gratuitos testados)</li>
+<li>Processo permanente: <strong>prompts de cada fase versionados antes da próxima</strong> — <code>docs/prompts/desenvolvimento/</code></li>
+</ul>
+<hr />
+<h2 id="proximos-passos-resumo">🗺️ Próximos passos (resumo)</h2>
+<blockquote>
+<p>Ver a seção <strong>📦 Estado de Entrega</strong> acima para o checklist detalhado (do ✅ pronto ao ⬜ pendente).</p>
+</blockquote>
+<p><strong>Curto prazo (antes das 15h):</strong> gravar o vídeo a partir do roteiro pronto → atualizar README com o link → commit → merge <code>develop → main</code> → AVA.</p>
+<p><strong>Pós-entrega:</strong> revogar <code>LLM_API_KEY</code>, rotacionar o webhook do Discord e (se houver) a API key do Flowise.</p>
+<hr />
+<h2 id="090-3108-finalizacao-entrega-parte-9-em-curso">[0.9.0] — 31/08 — Finalização / Entrega (Parte 9) — ⏳ em curso</h2>
+<h3 id="feito_1">Feito</h3>
+<ul>
+<li><strong>README final</strong> (commit <code>f134187</code>) — atende integralmente a seção 5.2 do brief: descrição/classificação/arquitetura, tool, memória, segurança, 7 cenários (incluindo carrinho), QA/observabilidade/DevOps, low-code Flowise, instalação, testes, 3 refinamentos linkados + limitações, links para toda a documentação, placeholder do vídeo</li>
+<li><strong>Refinamento 3</strong> (commit <code>c258120</code>) — Chatflow → Agentflow V2 (erro de JSON ao conectar) documentado em <a href="docs/prompts/refinamentos/refinamento-3-chatflow-para-agentflow-v2.html"><code>docs/prompts/refinamentos/refinamento-3-chatflow-para-agentflow-v2.md</code></a> — atende critério 15</li>
+<li><strong>Feature extra: recomendação por carrinho</strong> (commit <code>2b24511</code>) — <code>seed_products: list[int]</code> no request, coocorrência market-basket com base no carrinho, 11 testes novos, 0 regressões</li>
+<li><strong>Roteiro detalhado do vídeo</strong> (commit <code>00be4b3</code>) — <a href="docs/video/roteiro-video-fase-9.html"><code>docs/video/roteiro-video-fase-9.md</code></a> com timestamps, falas, comandos <code>curl</code> prontos e checklist pré-gravação</li>
+<li>Documentação consolidada: README, CHANGELOG, plano-execucao, prompts (9 fases + 3 refinamentos) — todos sincronizados</li>
+</ul>
+<h3 id="pendente-ordem">Pendente (ordem)</h3>
+<ul>
+<li>[ ] Gravar vídeo (≤ 12 min) seguindo o roteiro</li>
+<li>[ ] Upload no YouTube como não listado</li>
+<li>[ ] Substituir o placeholder 🚧 na seção 13 do README pelo link</li>
+<li>[ ] Commit do link + push na <code>develop</code></li>
+<li>[ ] <strong>Merge <code>develop</code> → <code>main</code></strong> (manter <code>main</code> como versão final funcional)</li>
+<li>[ ] Convidar professor como colaborador</li>
+<li>[ ] Submeter links (repo + quadro + vídeo) no AVA — <strong>antes das 15h</strong></li>
+<li>[ ] Atualizar Kanban (cards 8 e 9 → Concluído)</li>
+<li>[ ] Não alterar o repositório após o prazo (brief § 7)</li>
+</ul>
+<h3 id="pos-entrega-seguranca">Pós-entrega (segurança)</h3>
+<ul>
+<li>[ ] Revogar <code>LLM_API_KEY</code> OpenCode (exposta no chat)</li>
+<li>[ ] Rotacionar webhook do Discord</li>
+<li>[ ] Rotacionar/limpar API key do Flowise (se gerada)</li>
+</ul>
+<hr />
+<h2 id="081-3108-recomendacao-por-carrinhoproduto-semente-parte-9-extra">[0.8.1] — 31/08 — Recomendação por carrinho/produto semente (Parte 9, extra)</h2>
+<h3 id="adicionado">Adicionado</h3>
+<ul>
+<li><strong>API</strong>: campo opcional <code>seed_products: list[int]</code> em <code>RecommendationRequest</code> (máx. 10) — códigos de produtos pesquisados ou no carrinho</li>
+<li><strong>Tool</strong> <code>find_similar_products(..., seed_products=None)</code>: com sementes, a coocorrência market-basket passa a usar como base os pedidos que contêm os produtos do carrinho (excluindo os próprios sementes); sem sementes → comportamento atual intacto (zero regressão)</li>
+<li><strong>State</strong>: <code>seed_products: list[int]</code> (state tipado)</li>
+<li><strong>Grafo</strong>:</li>
+<li><code>validate_input</code>: filtra códigos fora do catálogo (aviso em <code>errors</code>); todos inválidos → <code>status: error</code></li>
+<li><code>find_similar_products_node</code>: repassa <code>seed_products</code> à tool</li>
+<li><code>generate_recommendations</code> + <code>build_user_prompt</code>: seção "PRODUTOS NO CARRINHO" injetada quando há sementes</li>
+<li><strong>Teste visual sem dependência extra</strong>: <code>http://localhost:8000/docs</code> (Swagger UI do FastAPI) — <code>Try it out</code> em <code>POST /recomendacoes</code> aceita <code>seed_products</code> e mostra o JSON</li>
+<li><strong>Classe de testes</strong> <code>tests/test_carrinho.py</code> (11 testes): tool (coocorrência do carrinho + semente inválida + compat sem sementes), grafo (prompt contém seção + fallback usa carrinho + códigos inválidos filtrados + todos inválidos = error), API (sucesso + backward-compat + 422 para &gt;10 + injection ainda bloqueada)</li>
+</ul>
+<h3 id="bugs-corrigidos-durante-a-feature">Bugs corrigidos durante a feature</h3>
+<ul>
+<li><strong>Erros sobrescritos entre nodes</strong>: <code>generate_recommendations</code> zerava <code>errors</code> no caminho de sucesso → avisos do filtro de sementes eram apagados. Fix: ler <code>state["errors"]</code> no início e preservar</li>
+<li><strong>Erros vazando entre chamadas no mesmo thread</strong> (MemorySaver): <code>validate_input</code> herdava <code>errors</code> do checkpoint anterior. Fix: <code>validate_input</code> agora começa com <code>errors = []</code> para cada nova execução</li>
+</ul>
+<h3 id="metricas">Métricas</h3>
+<ul>
+<li>Ruff limpo · <strong>57 testes passados</strong> (46 anteriores + 11 novos) · 1 falha pré-existente em <code>test_llm_smoke</code> (gateway não suporta mais <code>hy3-free</code>)</li>
+<li>100 % backward-compatible: requisições sem <code>seed_products</code> seguem idênticas</li>
+</ul>
+<hr />
+<h2 id="decisoes-registradas">🧭 Decisões registradas</h2>
+<table>
+<thead>
+<tr>
+<th>Decisão</th>
+<th>Motivo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM <code>hy3-free</code> (gateway OpenCode)</td>
+<td>Conta sem saldo para modelos pagos; gratuito e funcional (troca por env a qualquer momento)</td>
+</tr>
+<tr>
+<td>Flowise no lugar do N8N</td>
+<td>Trial N8N expirou; professor aprovou; melhor fit com "construção visual de agentes" (critério 14)</td>
+</tr>
+<tr>
+<td>Agentflow V2 via OpenRouter</td>
+<td>Flowise Cloud sem integração com o gateway OpenCode → modelo free equivalente via OpenRouter; Custom JS Function de chatflow não aceita Chat Model → Agentflow V2 (editor visual de agentes, mesma Prediction API; a app segue no <code>hy3-free</code>)</td>
+</tr>
+<tr>
+<td>Atividade individual</td>
+<td>Definido pelo brief (Planejamento.md corrigido)</td>
+</tr>
+<tr>
+<td>Memória: MemorySaver + histórico via tool</td>
+<td>Adequado ao domínio (base pequena, consulta por cliente); RAG vetorial desnecessário agora</td>
+</tr>
+<tr>
+<td>Fallback determinístico (coocorrência)</td>
+<td>Modelo gratuito com reasoning falha em ~1/3 das vezes — robustez + critério 15</td>
+</tr>
+<tr>
+<td>Prompts por fase versionados</td>
+<td>Comprovação do desenvolvimento assistido por IA (critérios 12/15)</td>
+</tr>
+<tr>
+<td>Recomendação por <code>seed_products</code> (carrinho)</td>
+<td>Caso de uso "você também pode precisar" no carrinho de compras (não previsto no brief original, adicionado na Parte 9 como feature extra); backward-compatible (default = comportamento histórico)</td>
+</tr>
+</tbody>
+</table></main></body></html>

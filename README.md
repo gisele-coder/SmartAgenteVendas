@@ -207,34 +207,58 @@ Reprodução passo a passo (webhook + Agentflow V2 + `.env`): [`docs/lowcode/rep
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate          # Windows  (source .venv/bin/activate  no Linux/macOS)
+# Windows PowerShell: .\.venv\Scripts\Activate.ps1
+# Linux/macOS: source .venv/bin/activate
 pip install -e ".[dev]"
 copy .env.example .env          # preencher LLM_BASE_URL, LLM_API_KEY, LLM_MODEL
 ```
 
-```bash
-uvicorn app.main:app --reload   # API em http://localhost:8000/health e /metrics
+No Windows/PowerShell, suba a aplicação a partir da raiz do projeto:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload
 ```
+
+Com a API em execução, abra no navegador:
+
+| Página | URL |
+|---|---|
+| Swagger UI | http://localhost:8000/docs |
+| ReDoc | http://localhost:8000/redoc |
+| README HTML | http://localhost:8000/readme |
+| Índice da documentação | http://localhost:8000/docs-index |
+| Health check | http://localhost:8000/health |
+| Métricas | http://localhost:8000/metrics |
+
+```bash
+# Linux/macOS
+python -m uvicorn app.main:app --reload
+```
+
+Para servir também as páginas HTML estáticas geradas em `docs-html/`, use outro terminal:
+
+```powershell
+python -m http.server 8080 --directory docs-html
+```
+
+Depois acesse o índice em http://localhost:8080/.
 
 Exemplo de uso:
 
-```bash
-curl -X POST http://localhost:8000/recomendacoes \
-  -H "Content-Type: application/json" \
-  -d '{"customer_id": 100011, "query": "recomende produtos"}'
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/recomendacoes" -Method Post -ContentType "application/json" -Body '{"customer_id":100011,"query":"recomende produtos"}' | ConvertTo-Json -Depth 10
 ```
 
 Recomendação a partir de um carrinho/produtos pesquisados (`seed_products`, opcional, máx. 10):
 
-```bash
-curl -X POST http://localhost:8000/recomendacoes \
-  -H "Content-Type: application/json" \
-  -d '{"customer_id": 100011, "seed_products": [10016, 10022]}'
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/recomendacoes" -Method Post -ContentType "application/json" -Body '{"customer_id":100011,"seed_products":[10016,10022]}' | ConvertTo-Json -Depth 10
 ```
 
 > Com `seed_products`, a coocorrência market-basket passa a usar como base os pedidos que contêm os produtos do carrinho (em vez do histórico do cliente) — útil para "você também pode precisar" no carrinho de compras.
 
-**Teste visual (sem instalar nada extra)**: abra `http://localhost:8000/docs` (Swagger UI gerado pelo FastAPI), clique em **POST /recomendacoes** → **Try it out** → preencha `customer_id` + `seed_products` → **Execute**. A resposta JSON aparece na tela. O mesmo endpoint usado pelo `curl` acima.
+**Teste visual (sem instalar nada extra)**: abra `http://localhost:8000/docs` (Swagger UI gerado pelo FastAPI), clique em **POST /recomendacoes** → **Try it out** → preencha `customer_id` + `seed_products` → **Execute**. A resposta JSON aparece na tela. O mesmo endpoint usado pelo `Invoke-RestMethod` acima.
 
 Para acionar o alerta no Discord durante a demo, habilite o Flowise **na sessão** (mantém `FLOWISE_ALERTS_ENABLED=false` no `.env` para não quebrar testes):
 

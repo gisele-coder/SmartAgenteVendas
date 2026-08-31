@@ -1,0 +1,75 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>review-07fbd7f-observabilidade | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/qa/code-reviews/review-07fbd7f-observabilidade.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="code-review-commit-07fbd7f-parte-5-observabilidade">Code Review — commit <code>07fbd7f</code> (Parte 5 — Observabilidade)</h1>
+<p><strong>Data:</strong> 2026-08-29 · <strong>Revisor:</strong> IA (análise assistida, opencode) · <strong>Diff analisado:</strong> <code>git show 07fbd7f -- app/</code> (builder.py, observability/, nodes.py, tools/)</p>
+<h2 id="contexto">Contexto</h2>
+<p>Commit que introduziu logs JSON por node, métricas agregadas e endpoint <code>/metrics</code>. Review focado em corretude de concorrência, correlação de sinais e cobertura de caminhos de falha.</p>
+<h2 id="achados-da-ia">Achados da IA</h2>
+<h3 id="a1-falhas-de-invocacao-nao-registradas-nas-metricas-corrigido">🔴 A1 — Falhas de invocação não registradas nas métricas (corrigido)</h3>
+<p><strong>Local:</strong> <code>app/graph/builder.py</code> — <code>run_recommendation</code>
+<strong>Problema:</strong> <code>record_run</code> só é chamado <strong>após</strong> <code>build_graph().invoke(...)</code> retornar. Se o invoke lançar exceção (ex.: falha na leitura da base, erro não capturado pelo fallback), a execução <strong>nunca entra nas métricas</strong> — um aumento real de taxa de erro ficaria invisível no <code>/metrics</code>, comprometendo a detecção de anomalias (critérios 11 e 13 do brief).
+<strong>Severidade:</strong> média-alta · <strong>Decisão:</strong> ✅ <strong>corrigido</strong> — <code>try/except</code> envolvendo o invoke: registra <code>record_run("error", ...)</code> e relança para a API responder 500. Teste novo cobre o caminho.</p>
+<h3 id="a2-custo-de-double-parse-no-formatter-json-aceito">🟡 A2 — Custo de double-parse no formatter JSON (aceito)</h3>
+<p><strong>Local:</strong> <code>app/observability/logging_config.py</code> — <code>JsonFormatter.format</code>
+<strong>Problema:</strong> cada linha de log tenta <code>json.loads</code> da mensagem antes de montar o payload — parse duplicado por linha.
+<strong>Decisão:</strong> ⏸️ aceito — volume atual é baixo (8 linhas/execução); alternativa (payload dict como <code>msg</code>) quebraria a asserção de mensagem única nos testes. Registrado como trade-off consciente.</p>
+<h3 id="a3-snapshot-com-copia-rasa-aceito-com-ressalva">🟡 A3 — <code>snapshot()</code> com cópia rasa (aceito, com ressalva)</h3>
+<p><strong>Local:</strong> <code>app/observability/metrics.py</code>
+<strong>Problema:</strong> <code>dict(_metrics)</code> é cópia rasa — se surgirem valores aninhados no futuro, o snapshot poderia expor mutáveis internos fora do lock.
+<strong>Decisão:</strong> ⏸️ aceito — valores atuais são escalares imutáveis; nota documentada para evolução futura.</p>
+<h3 id="a4-padroes-corretos-identificados-positivo">🟢 A4 — Padrões corretos identificados (positivo)</h3>
+<ul>
+<li><code>snapshot()</code> copia <strong>sob lock</strong> e computa agregados fora dele — cópia atômica, consistente</li>
+<li>Chaves de métricas fixas (sem crescimento descontrolado de memória)</li>
+<li><code>reset()</code> para testes isolados por fixture <code>autouse</code></li>
+</ul>
+<h2 id="correcao-aplicada-a1">Correção aplicada (A1)</h2>
+<pre><code class="language-python"># app/graph/builder.py — run_recommendation
+t0 = time.perf_counter()
+try:
+    result = build_graph().invoke(request, config={&quot;configurable&quot;: configurable})
+except Exception:
+    total_ms = round((time.perf_counter() - t0) * 1000, 1)
+    record_run(&quot;error&quot;, True, 0, total_ms, 0.0)   # marca fallback pois nenhum output foi produzido
+    raise
+</code></pre>
+<pre><code class="language-python"># tests/test_observability.py — novo teste
+def test_metricas_registram_falha_de_invocacao(monkeypatch):
+    def _boom():
+        raise RuntimeError(&quot;falha simulada da tool&quot;)
+    monkeypatch.setattr(&quot;app.graph.builder.build_graph&quot;, _boom)
+    with pytest.raises(RuntimeError):
+        run_recommendation({&quot;request_id&quot;: &quot;fail-001&quot;, &quot;customer_id&quot;: 100011, &quot;query&quot;: &quot;&quot;}, llm=FakeLLM(&quot;{}&quot;))
+    snap = snapshot()
+    assert snap[&quot;runs_total&quot;] == 1
+    assert snap[&quot;error_total&quot;] == 1
+</code></pre>
+<h2 id="evidencia">Evidência</h2>
+<ul>
+<li>Diff analisado: <code>git show 07fbd7f</code></li>
+<li>Correção aplicada neste branch (<code>feature/qa-inteligente</code>) junto com o teste de regressão</li>
+<li>Cobertura pós-correção: ver <a href="../relatorios/relatorio-cobertura-2026-08-29.html"><code>../relatorios/relatorio-cobertura-2026-08-29.md</code></a></li>
+</ul></main></body></html>

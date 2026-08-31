@@ -1,0 +1,108 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>prompts | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/README.md</span><span>· <a href="../../index.html">início</a></span></nav><hr />
+<p>origem: convenção definida pelo brief do projeto (seção 5.4)
+status: placeholder
+data: 2026-08-27
+finalidade: documentar prompts de sistema e histórico de refinamento do agente
+relacionado: <a href="../index.html">../README.md</a></p>
+<hr />
+<h1 id="prompts">Prompts</h1>
+<p>Esta pasta concentra a documentação de <strong>prompts do agente</strong>, conforme exigido pelo brief do projeto (seção 4.10) e pela convenção de organização do <code>docs/</code> (seção 5.4).</p>
+<hr />
+<h2 id="finalidade">Finalidade</h2>
+<ul>
+<li>Manter <strong>instruções de sistema</strong> utilizadas pelo agente documentadas e versionadas</li>
+<li>Registrar <strong>regras de comportamento</strong>, objetivos da tarefa, restrições importantes e padrões de resposta esperados</li>
+<li>Preservar o <strong>histórico de refinamentos</strong>, apresentando o problema observado, a alteração realizada e o resultado obtido</li>
+<li>Evitar que prompts sensíveis fiquem dispersos pelo código</li>
+<li><strong>Comprovar o desenvolvimento assistido por IA</strong>: a subpasta <a href="desenvolvimento/index.html"><code>desenvolvimento/</code></a> registra os prompts reais usados em cada fase do projeto</li>
+</ul>
+<hr />
+<h2 id="estrutura-sugerida">Estrutura Sugerida</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo / Pasta</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>README.md</code></td>
+<td>Este arquivo — visão geral da pasta</td>
+</tr>
+<tr>
+<td><code>system.md</code></td>
+<td>Prompt de sistema principal do agente (regras, objetivos, restrições)</td>
+</tr>
+<tr>
+<td><code>refinamentos/</code></td>
+<td>Histórico iterativo de ajustes de prompt</td>
+</tr>
+<tr>
+<td><a href="desenvolvimento/index.html"><code>desenvolvimento/</code></a></td>
+<td>Prompts das fases de desenvolvimento assistido por IA (evidência por fase)</td>
+</tr>
+<tr>
+<td><code>outros-prompts.md</code></td>
+<td>Prompts auxiliares (ferramentas, validações, cenários específicos)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="status-atual">Status atual</h2>
+<p>Esta pasta já está populada:</p>
+<ul>
+<li><a href="system.html"><code>system.md</code></a> — prompt de sistema principal (definido na Parte 2)</li>
+<li><a href="outros-prompts.html"><code>outros-prompts.md</code></a> — prompt de usuário e prompts auxiliares</li>
+<li><a href="desenvolvimento/index.html"><code>desenvolvimento/</code></a> — prompts das fases 0-8 com evidências</li>
+<li><a href="refinamentos/index.html"><code>refinamentos/</code></a> — 3 ciclos de refinamento documentados (critério 15)</li>
+</ul>
+<blockquote>
+<p>Lembrete: o modelo (LLM) deve ser configurado por <strong>variável de ambiente</strong>, nunca hardcoded no repositório (seção 4.10 do brief).</p>
+</blockquote>
+<hr />
+<h2 id="modelo-de-entrada-para-refinamento">Modelo de Entrada para Refinamento</h2>
+<p>Cada entrada em <code>refinamentos/</code> pode seguir este padrão:</p>
+<pre><code class="language-markdown"># Refinamento — &lt;data ou versão&gt;
+
+## Problema Observado
+- &lt;descrição do comportamento inadequado ou oportunidade&gt;
+
+## Alteração Realizada
+- &lt;mudança aplicada ao prompt&gt;
+
+## Resultado Obtido
+- &lt;efeito mensurável ou qualitativo observado&gt;
+- &lt;evidência: log, métrica, screenshot, link&gt;
+</code></pre>
+<hr />
+<h2 id="referencias">Referências</h2>
+<ul>
+<li>Brief: <a href="../Projeto_Avaliativo_modulo_2.html"><code>../Projeto_Avaliativo_modulo_2.md</code></a> — seção 4.10</li>
+<li>Índice geral: <a href="../index.html"><code>../README.md</code></a></li>
+</ul></main></body></html>

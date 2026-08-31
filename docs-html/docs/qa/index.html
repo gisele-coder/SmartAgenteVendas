@@ -1,0 +1,116 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>qa | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/qa/README.md</span><span>· <a href="../../index.html">início</a></span></nav><hr />
+<p>origem: convenção definida pelo brief do projeto (seção 5.4)
+status: placeholder
+data: 2026-08-27
+finalidade: concentrar evidências de QA — code review, testes e priorização por risco
+relacionado: <a href="../index.html">../README.md</a></p>
+<hr />
+<h1 id="qa-quality-assurance">QA — Quality Assurance</h1>
+<p>Esta pasta concentra as <strong>evidências de QA</strong> do projeto, conforme exigido pelo brief (seção 4.7) e pela convenção de organização do <code>docs/</code> (seção 5.4).</p>
+<hr />
+<h2 id="finalidade">Finalidade</h2>
+<ul>
+<li>Registrar <strong>code reviews</strong> realizados com apoio de IA</li>
+<li>Documentar <strong>suites de teste</strong> (unitário, integração, aceitação, E2E)</li>
+<li>Justificar a <strong>priorização por risco, impacto ou criticidade</strong> dos testes</li>
+<li>Servir como evidência objetiva para o critério de avaliação <strong>#12</strong> (seção 6.6 do brief)</li>
+</ul>
+<hr />
+<h2 id="status-atual">Status atual</h2>
+<ul>
+<li>✅ <strong>Code review com IA de diff real</strong>: <a href="code-reviews/review-07fbd7f-observabilidade.html"><code>code-reviews/review-07fbd7f-observabilidade.md</code></a> — achado A1 corrigido (falhas de invocação agora contam nas métricas)</li>
+<li>✅ <strong>Cobertura</strong>: <a href="relatorios/relatorio-cobertura-2026-08-29.html"><code>relatorios/relatorio-cobertura-2026-08-29.md</code></a> — 95% total, 42 testes</li>
+<li>✅ <strong>Priorização por risco</strong>: <a href="priorizacao-risco.html"><code>priorizacao-risco.md</code></a> — matriz com 6 cenários; prioridade 1 = acesso indevido a dados de outros clientes</li>
+<li>✅ <strong>Tipos de teste</strong>: unitários + integração (HTTP→grafo→tools→base) + E2E real com LLM</li>
+</ul>
+<h2 id="estrutura">Estrutura</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo / Pasta</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>README.md</code></td>
+<td>Este arquivo — visão geral da pasta</td>
+</tr>
+<tr>
+<td><code>code-reviews/</code></td>
+<td>Relatórios de revisão de código com IA (diffs analisados, problemas encontrados, sugestões)</td>
+</tr>
+<tr>
+<td><code>relatorios/</code></td>
+<td>Sumários de qualidade, cobertura e resultados</td>
+</tr>
+<tr>
+<td><code>priorizacao-risco.md</code></td>
+<td>Justificativa do(s) teste(s) priorizado(s) por risco, impacto ou criticidade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="quando-popular">Quando Popular</h2>
+<p>✅ Populada na Parte 6 (29/08): PR real analisado com IA, testes de integração/E2E consolidados, priorização por risco documentada e relatório de cobertura arquivado.</p>
+<hr />
+<h2 id="modelo-de-code-review">Modelo de Code Review</h2>
+<p>Cada entrada em <code>code-reviews/</code> pode seguir este padrão:</p>
+<pre><code class="language-markdown"># Code Review — &lt;PR ou commit hash&gt;
+
+## Contexto
+- &lt;descrição da alteração&gt;
+
+## Achados da IA
+- &lt;problemas identificados&gt;
+- &lt;oportunidades de melhoria&gt;
+
+## Decisões Tomadas
+- &lt;quais sugestões foram aplicadas, quais foram descartadas e por quê&gt;
+
+## Evidência
+- &lt;link para o PR, log da análise, etc.&gt;
+</code></pre>
+<hr />
+<h2 id="modelo-de-justificativa-de-priorizacao">Modelo de Justificativa de Priorização</h2>
+<p>Em <code>priorizacao-risco.md</code>, listar para cada teste prioritário:</p>
+<ul>
+<li><strong>Cenário:</strong> <descrição do cenário></li>
+<li><strong>Impacto:</strong> <alto | médio | baixo></li>
+<li><strong>Probabilidade de falha:</strong> <alta | média | baixa></li>
+<li><strong>Risco:</strong> <alto | médio | baixo></li>
+<li><strong>Prioridade:</strong> &lt;1 | 2 | 3&gt;</li>
+<li><strong>Justificativa:</strong> <por que esse cenário merece atenção prioritária></li>
+</ul>
+<hr />
+<h2 id="referencias">Referências</h2>
+<ul>
+<li>Brief: <a href="../Projeto_Avaliativo_modulo_2.html"><code>../Projeto_Avaliativo_modulo_2.md</code></a> — seções 4.7 e 6.6 (critério #12)</li>
+<li>Evidências correlacionadas: <a href="../evidencias/index.html"><code>../evidencias/</code></a></li>
+<li>Índice geral: <a href="../index.html"><code>../README.md</code></a></li>
+</ul></main></body></html>

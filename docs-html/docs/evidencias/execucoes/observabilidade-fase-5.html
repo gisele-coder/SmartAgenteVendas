@@ -1,0 +1,96 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>observabilidade-fase-5 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/evidencias/execucoes/observabilidade-fase-5.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="execucao-observabilidade-fase-5">Execução — Observabilidade (Fase 5)</h1>
+<p><strong>Data:</strong> 2026-08-29 · <strong>Fase:</strong> 5 — Observabilidade · <strong>Tipo:</strong> 3 execuções reais com captura dos sinais correlacionados por <code>request_id</code></p>
+<hr />
+<h2 id="sinais-da-aplicacao">Sinais da aplicação</h2>
+<table>
+<thead>
+<tr>
+<th>Sinal</th>
+<th>Meio</th>
+<th>Correlação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Logs estruturados JSON</strong></td>
+<td><code>logs/execution.log</code> (logger <code>smartorder.flow</code>, 1 linha JSON por node com latência)</td>
+<td><code>request_id</code></td>
+</tr>
+<tr>
+<td><strong>2. Métricas agregadas</strong></td>
+<td><code>GET /metrics</code> (contadores, latências, taxas)</td>
+<td>agregado por execução gravada</td>
+</tr>
+<tr>
+<td><strong>3. Audit log JSONL</strong></td>
+<td><code>logs/audit.jsonl</code> (eventos por node)</td>
+<td><code>request_id</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="execucoes">Execuções</h2>
+<ol>
+<li><strong><code>obs-real-001</code></strong> — fluxo principal com LLM real (<code>hy3-free</code>): success, 3 recomendações, LLM = 22.921,5 ms</li>
+<li><strong><code>obs-real-002</code></strong> — prompt injection: blocked em &lt;1 ms (caminho curto: validate → security → block → finalize, sem tools/LLM)</li>
+<li><strong><code>obs-real-003</code></strong> — pico de latência simulado na tool (<code>tool_delay_ms=500</code>): tools = 503,0/507,9 ms; LLM falhou em produzir JSON → <strong>fallback determinístico acionado</strong> (<code>fallback_rate</code> 0,33)</li>
+</ol>
+<h2 id="snapshot-get-metrics-apos-as-3-execucoes">Snapshot <code>GET /metrics</code> após as 3 execuções</h2>
+<pre><code class="language-json">{
+ &quot;runs_total&quot;: 3,
+ &quot;success_total&quot;: 2,
+ &quot;blocked_total&quot;: 1,
+ &quot;error_total&quot;: 0,
+ &quot;fallback_total&quot;: 1,
+ &quot;recommendations_total&quot;: 3,
+ &quot;total_ms_max&quot;: 29203.3,
+ &quot;tool_ms_max&quot;: 1010.9,
+ &quot;total_ms_avg&quot;: 17462.8,
+ &quot;tool_ms_avg&quot;: 344.7,
+ &quot;block_rate&quot;: 0.33,
+ &quot;fallback_rate&quot;: 0.33
+}
+</code></pre>
+<h2 id="logs-estruturados-amostra-logsexecutionlog">Logs estruturados (amostra — <code>logs/execution.log</code>)</h2>
+<pre><code class="language-json">{&quot;request_id&quot;: &quot;obs-real-001&quot;, &quot;node&quot;: &quot;get_purchase_history&quot;, &quot;latency_ms&quot;: 2.6, &quot;items&quot;: 30, &quot;orders&quot;: 10}
+{&quot;request_id&quot;: &quot;obs-real-001&quot;, &quot;node&quot;: &quot;generate_recommendations&quot;, &quot;latency_ms&quot;: 22921.5, &quot;source&quot;: &quot;llm&quot;, &quot;count&quot;: 3}
+{&quot;request_id&quot;: &quot;obs-real-002&quot;, &quot;node&quot;: &quot;security_check&quot;, &quot;latency_ms&quot;: 0.1, &quot;blocked&quot;: true, &quot;kind&quot;: &quot;injection&quot;}
+{&quot;request_id&quot;: &quot;obs-real-003&quot;, &quot;node&quot;: &quot;get_purchase_history&quot;, &quot;latency_ms&quot;: 503.0, &quot;items&quot;: 32, &quot;orders&quot;: 11}
+{&quot;request_id&quot;: &quot;obs-real-003&quot;, &quot;node&quot;: &quot;generate_recommendations&quot;, &quot;latency_ms&quot;: 28688.9, &quot;source&quot;: &quot;fallback&quot;, &quot;error&quot;: &quot;resposta do LLM sem array JSON&quot;}
+</code></pre>
+<h2 id="investigacao-da-execucao-obs-real-001-requisito-do-brief-46">Investigação da execução <code>obs-real-001</code> (requisito do brief 4.6)</h2>
+<ul>
+<li><strong>Fluxo percorrido</strong>: validate_input → security_check → [get_purchase_history ∥ find_similar_products] → generate_recommendations → validate_recommendations → finalize_response</li>
+<li><strong>Decisões relevantes</strong>: security_ok (consulta legítima); LLM escolheu 3 produtos do catálogo com justificativas; validação determinística manteve os 3 (todos no catálogo)</li>
+<li><strong>Erros</strong>: nenhum; <strong>latência</strong>: gargalo absoluto no LLM (22,9 s de 23,2 s totais — 98,8%)</li>
+</ul>
+<h2 id="conclusao-da-analise">Conclusão da análise</h2>
+<ul>
+<li>Correlação 1:1 entre os três sinais via <code>request_id</code> permite reconstruir qualquer execução</li>
+<li>O gargalo é o LLM (modelo gratuito com reasoning) — metrics e logs deixam isso evidente; justifica o fallback e alimenta a análise de anomalias da Parte 7</li>
+<li>O pico simulado de tool latency (500 ms → capturado como ~1010 ms somando as duas tools paralelas) demonstra que a métrica detecta anomalias reais</li>
+</ul></main></body></html>

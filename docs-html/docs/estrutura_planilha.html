@@ -1,0 +1,281 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>estrutura_planilha | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/estrutura_planilha.md</span><span>· <a href="../index.html">início</a></span></nav><hr />
+<p>origem: reconstrução a partir de <a href="sobre_a_planilha.html">./sobre_a_planilha.md</a>
+status: referência — requer confirmação após abertura do arquivo
+data: 2026-08-27
+finalidade: mapear tecnicamente a estrutura da planilha fictícia
+arquivo: <a href="../data/base_ficticia_pedidos_agente_ia.xlsx">../data/base_ficticia_pedidos_agente_ia.xlsx</a></p>
+<hr />
+<h1 id="estrutura-da-planilha-base_ficticia_pedidos_agente_iaxlsx">Estrutura da Planilha — <code>base_ficticia_pedidos_agente_ia.xlsx</code></h1>
+<blockquote>
+<p><strong>Status:</strong> ✅ <strong>CONFIRMADO EM 29/08</strong> via inspeção programática (<code>pandas</code>). Ver seção <code>## Correções</code> ao final deste documento.</p>
+</blockquote>
+<hr />
+<h2 id="1-visao-geral">1. Visão Geral</h2>
+<p>Base fictícia estruturada para servir como <strong>laboratório de testes</strong> do agente inteligente de pedidos (SmartOrder AI). Substitui temporariamente a integração com o ERP real.</p>
+<table>
+<thead>
+<tr>
+<th>Atributo</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tipo</td>
+<td>Planilha Excel (<code>.xlsx</code>)</td>
+</tr>
+<tr>
+<td>Tamanho</td>
+<td>~27 KB</td>
+</tr>
+<tr>
+<td>Origem</td>
+<td>Gerada para o projeto</td>
+</tr>
+<tr>
+<td>Substituível por</td>
+<td>WebService do ERP real (sem mudança na lógica do agente)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-abas-confirmadas">2. Abas Confirmadas</h2>
+<table>
+<thead>
+<tr>
+<th>Aba</th>
+<th>Conteúdo</th>
+<th>Confirmado?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PEDIDOS</code></td>
+<td>Tabela principal: 343 linhas de itens × 12 colunas</td>
+<td>✅ Confirmado</td>
+</tr>
+<tr>
+<td><code>LEIA_ME</code></td>
+<td>6 linhas × 2 colunas (<code>CAMPO</code>, <code>DESCRICAO</code>) explicando a base</td>
+<td>✅ Confirmado</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Não há outras abas.</p>
+</blockquote>
+<hr />
+<h2 id="3-esquema-de-colunas-inferido">3. Esquema de Colunas — Inferido</h2>
+<p>O esquema é o mesmo identificado para os pedidos reais do projeto. Tipos e descrições abaixo são <strong>inferências</strong> baseadas no domínio.</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo Inferido</th>
+<th>Descrição</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PEDIDO</code></td>
+<td>Inteiro / String</td>
+<td>Identificador único do pedido</td>
+<td>Chave do pedido</td>
+</tr>
+<tr>
+<td><code>CLIENTE</code></td>
+<td>Inteiro / String</td>
+<td>Identificador único do cliente</td>
+<td>Chave do cliente</td>
+</tr>
+<tr>
+<td><code>QTD</code></td>
+<td>Inteiro</td>
+<td>Quantidade do item no pedido</td>
+<td>Sempre ≥ 1</td>
+</tr>
+<tr>
+<td><code>COD_PROD</code></td>
+<td>String</td>
+<td>Código interno do produto</td>
+<td>Chave do produto</td>
+</tr>
+<tr>
+<td><code>VALOR</code></td>
+<td>Decimal</td>
+<td><strong>Valor TOTAL da linha (BRL)</strong></td>
+<td>Confirmado: <code>QTD × preço unitário</code> (unitários terminam em <code>.9</code>)</td>
+</tr>
+<tr>
+<td><code>BARCODE</code></td>
+<td>String</td>
+<td>Código de barras (EAN-13 ou similar)</td>
+<td>Pode ter nulos</td>
+</tr>
+<tr>
+<td><code>PRODUTO</code></td>
+<td>String</td>
+<td>Descrição comercial do produto</td>
+<td>Texto livre</td>
+</tr>
+<tr>
+<td><code>MARCA</code></td>
+<td>String</td>
+<td>Marca do produto</td>
+<td>Pode ter nulos</td>
+</tr>
+<tr>
+<td><code>REF</code></td>
+<td>String</td>
+<td>Referência do fabricante / SKU</td>
+<td>Código auxiliar</td>
+</tr>
+<tr>
+<td><code>SETOR</code></td>
+<td>String</td>
+<td>Setor/área do produto</td>
+<td>Ex.: Climatização, Construção</td>
+</tr>
+<tr>
+<td><code>CATEGORIA</code></td>
+<td>String</td>
+<td>Categoria comercial</td>
+<td>Ex.: Eletroportáteis, Cozinha</td>
+</tr>
+<tr>
+<td><code>TIPO</code></td>
+<td>String</td>
+<td>Tipo/subcategoria</td>
+<td>Granularidade mais fina</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-cardinalidade-e-estatisticas">4. Cardinalidade e Estatísticas</h2>
+<p>Estatísticas esperadas com base em <code>sobre_a_planilha.md</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th style="text-align: right;">Valor Esperado</th>
+<th>Confirmado?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total de pedidos distintos</td>
+<td style="text-align: right;">120</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Total de linhas de itens</td>
+<td style="text-align: right;">343</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Clientes fictícios distintos</td>
+<td style="text-align: right;">12</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Produtos distintos</td>
+<td style="text-align: right;">22</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Média de itens por pedido</td>
+<td style="text-align: right;">~2,86 (343 / 120)</td>
+<td>✅ derivado</td>
+</tr>
+<tr>
+<td>Pedidos por cliente (min / max / média)</td>
+<td style="text-align: right;">5 / 15 / 10,0</td>
+<td>✅ medido</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>A média calculada acima é apenas referência. Pedidos com múltiplos produtos são propositais (vide <code>sobre_a_planilha.md</code>, seção 4).</p>
+</blockquote>
+<hr />
+<h2 id="5-lacunas-resolvidas-em-2908">5. Lacunas — Resolvidas em 29/08</h2>
+<ul>
+<li>[x] Nome exato das abas → <code>PEDIDOS</code> e <code>LEIA_ME</code></li>
+<li>[x] Abas adicionais → nenhuma</li>
+<li>[x] <code>VALOR</code> → <strong>total da linha</strong> (QTD × unitário; unitários terminam em <code>.9</code>)</li>
+<li>[x] Nulos → <strong>zero nulos em todas as 12 colunas</strong></li>
+<li>[x] Esquema → <strong>plano</strong>: 1 linha por item; mesmo <code>PEDIDO</code> = itens comprados juntos; sem duplicatas <code>PEDIDO+COD_PROD</code></li>
+<li>[x] Coluna de data → <strong>não existe</strong></li>
+<li>[x] Distribuição por cliente → min 5, max 15, média 10,0 pedidos/cliente</li>
+</ul>
+<hr />
+<h2 id="6-proximos-passos">6. Próximos Passos</h2>
+<ol>
+<li>~~Abrir o <code>.xlsx</code> e validar~~ ✅ Concluído em 29/08</li>
+<li>~~Atualizar este arquivo~~ ✅ Concluído</li>
+<li>~~Seção <code>## Correções</code>~~ ✅ Abaixo</li>
+</ol>
+<hr />
+<h2 id="correcoes">Correções</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Item documentado antes</th>
+<th>Real confirmado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Aba principal chamada <code>Dados</code> (inferido)</td>
+<td>Aba chama-se <strong><code>PEDIDOS</code></strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>VALOR</code> possivelmente unitário</td>
+<td><strong>Total da linha</strong> (BRL)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Nulos possíveis em <code>BARCODE</code>, <code>MARCA</code>, <code>REF</code></td>
+<td><strong>Nenhum nulo</strong> em nenhuma coluna</td>
+</tr>
+<tr>
+<td>4</td>
+<td>"Média de pedidos por cliente ~10 (120/12)"</td>
+<td>Média exata 10,0 (min 5, max 15)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>LEIA_ME</code> com instruções genéricas</td>
+<td>6 linhas × 2 colunas (<code>CAMPO</code>/<code>DESCRICAO</code>), incluindo a linha "Uso para IA"</td>
+</tr>
+</tbody>
+</table></main></body></html>

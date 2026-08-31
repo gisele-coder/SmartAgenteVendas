@@ -3,7 +3,7 @@ origem: sessão de planejamento do projeto (opencode)
 status: oficial
 data: 2026-08-29
 finalidade: documento-mestre de execução — partes 0-9, critérios atendidos, evidências e observações de entrega
-relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts/desenvolvimento/README.md)
+relacionado: 
 ---
 
 # Plano de Execução — SmartOrder AI

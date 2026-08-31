@@ -1,0 +1,122 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>outros-prompts | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/outros-prompts.md</span><span>· <a href="../../index.html">início</a></span></nav><hr />
+<p>origem: prompt de usuário do agente SmartOrder AI
+status: oficial
+data: 2026-08-29
+finalidade: documentar prompts auxiliares (prompt de usuário e outros prompts não-sistema)
+relacionado: <a href="system.html">./system.md</a></p>
+<hr />
+<h1 id="prompts-auxiliares-smartorder-ai">Prompts Auxiliares — SmartOrder AI</h1>
+<blockquote>
+<p>Fonte de verdade em código: <code>app/graph/prompts.py</code> (função <code>build_user_prompt</code>).</p>
+</blockquote>
+<hr />
+<h2 id="prompt-de-usuario-build_user_prompt">Prompt de usuário — <code>build_user_prompt</code></h2>
+<p>Montado dinamicamente no node <code>generate_recommendations</code>, com quatro seções:</p>
+<pre><code class="language-text">CLIENTE {customer_id}
+
+HISTÓRICO DE COMPRA:
+- {produto} (cod {cod_prod}) | setor {setor} | categoria {categoria}   ← até 40 linhas
+
+COOCORRÊNCIA CALCULADA (comprados junto com o histórico deste cliente):
+- {produto} (cod {cod_prod}) coocorrência {n} confiança {0..1}
+
+CATÁLOGO DISPONÍVEL:
+- cod {cod_prod}: {produto} | setor {setor} | categoria {categoria}   ← 22 produtos
+
+Gere as recomendações no formato JSON definido.
+</code></pre>
+<h3 id="regras-de-montagem">Regras de montagem</h3>
+<table>
+<thead>
+<tr>
+<th>Seção</th>
+<th>Fonte</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLIENTE</code></td>
+<td>State (<code>customer_id</code>)</td>
+<td>Identifica o thread na conversa com o modelo</td>
+</tr>
+<tr>
+<td><code>HISTÓRICO DE COMPRA</code></td>
+<td>Tool <code>get_customer_orders</code></td>
+<td>Cap de 40 linhas para controlar tokens</td>
+</tr>
+<tr>
+<td><code>COOCORRÊNCIA</code></td>
+<td>Tool <code>find_similar_products</code></td>
+<td>Top 5, já excluindo produtos já comprados</td>
+</tr>
+<tr>
+<td><code>CATÁLOGO DISPONÍVEL</code></td>
+<td><code>get_catalog()</code></td>
+<td>Catálogo completo — o LLM só pode escolher entre estes códigos</td>
+</tr>
+</tbody>
+</table>
+<h3 id="por-que-esse-formato">Por que esse formato</h3>
+<ul>
+<li>O <strong>catálogo explícito</strong> fecha a superfície de alucinação: o <code>SYSTEM_PROMPT</code> proíbe produtos fora dele e o node <code>validate_recommendations</code> descarta qualquer <code>cod_prod</code> inexistente (defesa em profundidade)</li>
+<li>A seção de <strong>coocorrência</strong> dá ao modelo evidência quantitativa ("comprado junto N vezes") para justificar recomendações</li>
+<li>O histórico limitado mantém o prompt econômico (~2,3k tokens na prática) mesmo com modelo de reasoning</li>
+</ul>
+<h2 id="outros-prompts">Outros prompts</h2>
+<table>
+<thead>
+<tr>
+<th>Prompt</th>
+<th>Local</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prompt de sistema (identidade + regras + formato)</td>
+<td><a href="system.html"><code>system.md</code></a></td>
+<td>Node <code>generate_recommendations</code></td>
+</tr>
+<tr>
+<td>Prompt de usuário (contexto do cliente)</td>
+<td>Este documento (<code>build_user_prompt</code>)</td>
+<td>Node <code>generate_recommendations</code></td>
+</tr>
+<tr>
+<td>Prompts de refinamento</td>
+<td><a href="refinamentos/index.html"><code>refinamentos/</code></a></td>
+<td>Histórico de ciclos</td>
+</tr>
+<tr>
+<td>Prompts de desenvolvimento (por fase)</td>
+<td><a href="desenvolvimento/index.html"><code>desenvolvimento/</code></a></td>
+<td>Evidência do processo</td>
+</tr>
+</tbody>
+</table></main></body></html>

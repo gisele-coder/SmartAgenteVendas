@@ -1,0 +1,147 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>docs | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/README.md</span><span>· <a href="../index.html">início</a></span></nav><h1 id="documentacao-do-projeto">Documentação do Projeto</h1>
+<p>Esta pasta concentra <strong>toda a documentação do projeto</strong> conforme exigido pelo brief institucional (seção 5.4):</p>
+<blockquote>
+<p><em>Organizar toda a documentação e as evidências do projeto no diretório <code>/docs</code>, utilizando subpastas quando necessário.</em></p>
+</blockquote>
+<hr />
+<h2 id="indice-de-arquivos">Índice de Arquivos</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Tipo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="Projeto_Avaliativo_modulo_2.html"><code>Projeto_Avaliativo_modulo_2.md</code></a></td>
+<td>Brief</td>
+<td>Enunciado institucional da Situação de Aprendizagem — Módulo 2</td>
+</tr>
+<tr>
+<td><a href="plano-execucao.html"><code>plano-execucao.md</code></a></td>
+<td>Doc mestre</td>
+<td>Partes 0-9, critérios atendidos, evidências e observações de entrega (atualizado por parte)</td>
+</tr>
+<tr>
+<td><a href="sobre_a_planilha.html"><code>sobre_a_planilha.md</code></a></td>
+<td>Doc interna</td>
+<td>Descrição narrativa da base fictícia de pedidos</td>
+</tr>
+<tr>
+<td><a href="estrutura_planilha.html"><code>estrutura_planilha.md</code></a></td>
+<td>Doc interna</td>
+<td>Mapa técnico da planilha (abas e colunas)</td>
+</tr>
+<tr>
+<td><a href="../data/base_ficticia_pedidos_agente_ia.xlsx"><code>../data/base_ficticia_pedidos_agente_ia.xlsx</code></a></td>
+<td>Anexo</td>
+<td>Base de dados fictícia para testes do agente (movida para <code>data/</code> em 29/08)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="subpastas">Subpastas</h2>
+<table>
+<thead>
+<tr>
+<th>Subpasta</th>
+<th>Finalidade</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="prompts/index.html"><code>prompts/</code></a></td>
+<td>Prompts do sistema, prompts por fase de desenvolvimento e histórico de refinamentos</td>
+<td>✅ Ativa (7 fases + 2 refinamentos)</td>
+</tr>
+<tr>
+<td><a href="qa/index.html"><code>qa/</code></a></td>
+<td>Evidências de QA: code review com IA, cobertura, priorização por risco</td>
+<td>✅ Ativa (Parte 6)</td>
+</tr>
+<tr>
+<td><a href="evidencias/index.html"><code>evidencias/</code></a></td>
+<td>Logs, traces, métricas, screenshots e artefatos de execução</td>
+<td>✅ Ativa (4 evidências arquivadas)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="documentos-externos">Documentos Externos</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Localização</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Planejamento.md</code></td>
+<td><a href="../Planejamento.html"><code>../Planejamento.md</code></a></td>
+<td>Planejamento geral do MVP — SmartOrder AI</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="convencoes">Convenções</h2>
+<h3 id="nomenclatura">Nomenclatura</h3>
+<ul>
+<li>Preferir <strong>kebab-case</strong> para novos arquivos (<code>nome-do-doc.md</code>).</li>
+<li>Nomes descritivos do conteúdo, não do formato (<code>prompts.md</code> em vez de <code>doc1.md</code>).</li>
+<li>Arquivos do brief mantêm o nome original para rastreabilidade institucional.</li>
+</ul>
+<h3 id="estrutura-recomendada-para-novos-documentos">Estrutura recomendada para novos documentos</h3>
+<pre><code class="language-markdown">---
+origem: &lt;fonte do documento&gt;
+status: &lt;rascunho | revisão | referência | oficial&gt;
+data: &lt;AAAA-MM-DD&gt;
+---
+
+# Título
+
+&gt; Resumo de uma linha do conteúdo.
+
+## Seções
+
+- Listas para itens sem hierarquia forte
+- Tabelas para dados tabulares
+- Blocos de código para exemplos executáveis
+</code></pre>
+<h3 id="idioma">Idioma</h3>
+<p>Toda a documentação é escrita em <strong>português</strong>. Quando necessário, termos técnicos em inglês permanecem no original (ex.: <em>State</em>, <em>Tool</em>, <em>MCP</em>, <em>RAG</em>).</p>
+<hr />
+<h2 id="proximas-evolucoes">Próximas Evoluções</h2>
+<p>À medida que o desenvolvimento avançar, as subpastas placeholders devem ser populadas com:</p>
+<ul>
+<li><code>prompts/</code> — prompts de sistema e histórico de refinamentos</li>
+<li><code>qa/</code> — relatórios de code review, suites de teste e justificativas de priorização</li>
+<li><code>evidencias/</code> — artefatos comprobatórios de execução, logs, traces e métricas</li>
+</ul></main></body></html>

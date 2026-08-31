@@ -1,0 +1,111 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-8-lowcode | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-8-lowcode.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-31
+fase: 8 — Flowise Low-Code</p>
+<hr />
+<h1 id="fase-8-flowise-low-code">Fase 8 — Flowise Low-Code</h1>
+<blockquote>
+<p>Objetivo: ferramenta low-code (Flowise Cloud) acionada por evento HTTP da aplicação, com classificação de severidade por LLM e alerta observável no Discord (critério 14). A lógica principal permanece na aplicação; o Flowise é apoio visual.</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li><strong>Decisão de low-code (usuário, parte 1 — já documentada):</strong> N8N trial expirou → professor aprovou Flowise</li>
+<li><strong>Decisão de credencial/node (parte 2):</strong> Flowise Cloud não tem integração OpenCode → credencial e node do chatflow alterados para ChatOpenRouter (modelo free via OpenRouter)</li>
+<li><strong>Depuração do erro de conexão (parte 3):</strong> "Quando tento conectar o output do OpenRouter com o Input do Custom JS Function dá erro de Json" — levantada via leitura do código-fonte atual do node (<code>packages/components/nodes/utilities/CustomFunction/CustomFunction.ts</code> v3.0); causa: o anchor "Input Variables" é tipado como <code>json</code>, incompatível com saída de Chat Model</li>
+<li><strong>Diagnóstico e decisão de migração:</strong> "Percebi que o problema estava em eu tentar configurar o Flowiseai com Chatflows e não com Agentflows V2 disponível, mais apropriado para meu caso na ferramenta. Poderia atualizar a documentação e a configuração do Flowise com o Agentflows V2?" — confirmação da solução e aprovação do roteiro</li>
+<li><strong>Pedido de detalhamento (usuário):</strong> "seja detalhista nos passos do flowise pois não conheço muito a ferramenta" — passo 2 de <code>reproducao-flowise.md</code> reescrito com roteiro item-a-item</li>
+<li><strong>Coleta de artefatos (usuário):</strong> JSON exportado do agentflow + URL + ID + confirmação visual do alerta no Discord</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="aplicacao-appintegrationsflowisepy">Aplicação (<code>app/integrations/flowise.py</code>)</h3>
+<ul>
+<li><code>notify_flowise()</code> via <code>httpx</code> — chamada <strong>best-effort</strong> (exceção engolida), ativada por <code>FLOWISE_ALERTS_ENABLED=true</code> (mergeada em <code>0dc052c</code>)</li>
+<li>Eventos emitidos em <code>run_recommendation</code>: <code>security_blocked</code> (risco <code>high</code> para injection, <code>medium</code> para autonomia) e <code>recommendation_generation_failed</code> (fallback do LLM)</li>
+<li>5 testes novos (<code>tests/test_flowise.py</code>) — habilitação, payload, erro engolido, auth opcional</li>
+<li>Nenhuma alteração de código na Parte 8 baixa — a integração Python já estava pronta</li>
+</ul>
+<h3 id="fluxo-no-flowise-cloud-chatflow-agentflow-v2-decisao-chave">Fluxo no Flowise Cloud — Chatflow → Agentflow V2 (decisão chave)</h3>
+<ul>
+<li><strong>Primeira tentativa (descartada)</strong>: Chatflow V1 com <code>ChatPrompt → ChatOpenRouter → Custom Function</code> — <strong>falhou</strong>: o node <em>Custom JS Function</em> (v3.0) não aceita Chat Model (única entrada é anchor JSON), gerando o erro de JSON relatado pelo usuário</li>
+<li><strong>Solução</strong>: reconstrução como <strong>Agentflow V2</strong> (<code>Start → LLM → Custom Function</code>); o V2 é o editor visual de agentes do Flowise, encadeia os três nativamente e usa o mesmo endpoint de Prediction API</li>
+<li><strong>LLM configurado</strong>: <code>poolside/laguna-s-2.1</code> (OpenRouter free, temp 0,2) — slug completo descoberto via <code>responseMetadata.model_name</code> no trace do Flowise</li>
+<li><strong>Webhook</strong>: variável <code>DISCORD_WEBHOOK_URL</code> em <strong>Dashboard → Variables</strong> (não use o node "Set Variable"), acessível via <code>$vars</code> no Custom Function</li>
+<li><strong>Custom Function</strong>: <code>require('axios')</code> → <code>POST $vars.DISCORD_WEBHOOK_URL</code> com o alerta classificado em <code>content</code></li>
+<li><strong>Sem segredos no JSON exportado</strong> (validado por grep — <code>discord.com/api/webhooks/[0-9]</code>, <code>sk-or</code>, <code>Bearer</code>: nenhum match); seguro para versionar</li>
+<li>Exportado como <code>docs/lowcode/flowise-flow.json</code> (99,6 KB, 3 nodes, 2 edges)</li>
+</ul>
+<h3 id="demo-end-to-end-real-request_id-3bfceacea49f">Demo end-to-end real (<code>request_id: 3bfceacea49f</code>)</h3>
+<ul>
+<li>Requisição adversarial → <code>security_check</code> bloqueou (0,1 ms) → <code>flowise_notify</code> em 6,7 s → Agentflow V2 classificou (<code>SEVERIDADE: alta / EVENTO: ... / CAUSA PROVÁVEL / AÇÃO RECOMENDADA</code>) → Discord HTTP 204</li>
+<li>Três sinais correlacionados por <code>request_id</code>: logs JSON, audit JSONL, métricas (<code>/metrics</code>)</li>
+<li>Latência: 10,1 s total (98,8 % no Flowise — confirma Parte 5: LLM é o gargalo, agora em dois níveis)</li>
+<li>Alerta visual no canal <code>#smartorder-alertas</code> confirmado pelo usuário</li>
+</ul>
+<h3 id="decisoes-e-trade-offs">Decisões e trade-offs</h3>
+<ul>
+<li><strong>FLOWISE_API_KEY vazio</strong>: o endpoint <code>cloud.flowiseai.com/api/v1/prediction/&lt;id&gt;</code> respondeu <strong>200 sem autenticação</strong> (Flowise Cloud free, flow público); código já trata <code>flowise_api_key</code> opcional (<code>app/integrations/flowise.py:30</code>)</li>
+<li><strong><code>flowise_timeout_s=45</code></strong> (não 5): modelo free de reasoning pode levar 5–10 s; timeout alto evita alarmes falsos sem bloquear a API (chamada é best-effort)</li>
+<li><strong>Webhook do Discord em variável do Flowise</strong>: chave não trafega no <code>.env</code> da aplicação nem em logs</li>
+</ul>
+<hr />
+<h2 id="correcao-documental">Correção documental</h2>
+<ul>
+<li><strong>30/08</strong>: Flowise Cloud sem integração OpenCode → credencial/node <code>ChatOpenRouter</code></li>
+<li><strong>31/08</strong> (esta fase): Custom JS Function de Chatflow v3.x rejeita Chat Model → fluxo reconstruído como <strong>Agentflow V2</strong>; passo 2 de <code>reproducao-flowise.md</code> reescrito com roteiro detalhado (usuário não conhecia a ferramenta); <code>reproducao-flowise.md</code> passo 3 atualizado com <code>.env</code> real deste projeto; novo registro "Atualizar pendência pós-entrega: rotacionar URL do webhook Discord e API key do Flowise"</li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Demo E2E</td>
+<td><a href="../../evidencias/execucoes/flowise-discord-e2e-fase-8.html"><code>evidencias/execucoes/flowise-discord-e2e-fase-8.md</code></a> — request_id <code>3bfceacea49f</code>, todos os sinais correlacionados, alerta confirmado no Discord</td>
+</tr>
+<tr>
+<td>Fluxo versionado</td>
+<td><a href="../../lowcode/flowise-flow.json"><code>docs/lowcode/flowise-flow.json</code></a> — 3 nodes, 2 edges, sem segredos</td>
+</tr>
+<tr>
+<td>Screenshots</td>
+<td><a href="../../evidencias/screenshots/flowise-1-erro-conexao-chatflow.jpg"><code>evidencias/screenshots/flowise-1-erro-conexao-chatflow.jpg</code></a> (erro do Chatflow) · <a href="../../evidencias/screenshots/flowise-2-agentflow-discord-ok.jpg"><code>evidencias/screenshots/flowise-2-agentflow-discord-ok.jpg</code></a> (Agentflow V2 funcionando)</td>
+</tr>
+<tr>
+<td>Critério 14</td>
+<td>Atendido: ferramenta low-code com trigger (HTTP da app) e saída observável (mensagem Discord)</td>
+</tr>
+</tbody>
+</table></main></body></html>

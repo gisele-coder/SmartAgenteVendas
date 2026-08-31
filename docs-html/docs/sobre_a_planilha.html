@@ -1,0 +1,198 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>sobre_a_planilha | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/sobre_a_planilha.md</span><span>· <a href="../index.html">início</a></span></nav><hr />
+<p>origem: conversa de planejamento do projeto
+status: referência
+data: 2026-08-27
+finalidade: descrever a base fictícia de pedidos usada nos testes do agente
+relacionado: <a href="estrutura_planilha.html">./estrutura_planilha.md</a> | <a href="../data/base_ficticia_pedidos_agente_ia.xlsx">../data/base_ficticia_pedidos_agente_ia.xlsx</a></p>
+<hr />
+<h1 id="sobre-a-planilha-base-ficticia-de-pedidos">Sobre a Planilha — Base Fictícia de Pedidos</h1>
+<blockquote>
+<p>Base fictícia montada no mesmo modelo das 12 colunas identificadas, estruturada de propósito para ser útil nos testes do agente.</p>
+</blockquote>
+<hr />
+<h2 id="1-visao-geral">1. Visão Geral</h2>
+<p>A base funciona como <strong>laboratório seguro</strong> do agente:</p>
+<ul>
+<li>Sem necessidade de VPN</li>
+<li>Sem ERP real</li>
+<li>Sem exposição de dados de clientes</li>
+<li>Após validação, é substituível pela fonte real (WebService do ERP) sem mudar a lógica do agente</li>
+</ul>
+<hr />
+<h2 id="2-estatisticas">2. Estatísticas</h2>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th style="text-align: right;">Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pedidos simulados</td>
+<td style="text-align: right;">120</td>
+</tr>
+<tr>
+<td>Linhas de itens</td>
+<td style="text-align: right;">343</td>
+</tr>
+<tr>
+<td>Clientes fictícios</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr>
+<td>Produtos</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr>
+<td>Colunas do esquema</td>
+<td style="text-align: right;">12</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-esquema-12-colunas">3. Esquema — 12 Colunas</h2>
+<p>A planilha utiliza exatamente o modelo identificado para os pedidos do projeto:</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PEDIDO</code></td>
+<td>Identificador do pedido</td>
+</tr>
+<tr>
+<td><code>CLIENTE</code></td>
+<td>Identificador do cliente</td>
+</tr>
+<tr>
+<td><code>QTD</code></td>
+<td>Quantidade do item no pedido</td>
+</tr>
+<tr>
+<td><code>COD_PROD</code></td>
+<td>Código do produto</td>
+</tr>
+<tr>
+<td><code>VALOR</code></td>
+<td>Valor unitário ou total do item</td>
+</tr>
+<tr>
+<td><code>BARCODE</code></td>
+<td>Código de barras do produto</td>
+</tr>
+<tr>
+<td><code>PRODUTO</code></td>
+<td>Descrição do produto</td>
+</tr>
+<tr>
+<td><code>MARCA</code></td>
+<td>Marca do produto</td>
+</tr>
+<tr>
+<td><code>REF</code></td>
+<td>Referência do fabricante</td>
+</tr>
+<tr>
+<td><code>SETOR</code></td>
+<td>Setor/área ao qual o produto pertence</td>
+</tr>
+<tr>
+<td><code>CATEGORIA</code></td>
+<td>Categoria do produto</td>
+</tr>
+<tr>
+<td><code>TIPO</code></td>
+<td>Tipo/subcategoria do produto</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Nota:</strong> O significado exato de cada coluna está descrito tecnicamente em <a href="estrutura_planilha.html"><code>estrutura_planilha.md</code></a>.</p>
+</blockquote>
+<p>A planilha também inclui uma aba <strong><code>LEIA_ME</code></strong> explicando como a base foi estruturada.</p>
+<hr />
+<h2 id="4-relacoes-propositais">4. Relações Propositais</h2>
+<p>A base foi montada com combinações repetidas e intencionais para permitir <strong>testes de recomendação</strong>. As principais relações semânticas são:</p>
+<h3 id="41-climatizacao">4.1 Climatização</h3>
+<pre><code>Ar-condicionado → suporte condensadora → cabo PP → disjuntor
+</code></pre>
+<h3 id="42-construcao">4.2 Construção</h3>
+<pre><code>Porcelanato → argamassa → rejunte
+</code></pre>
+<h3 id="43-eletroportateis">4.3 Eletroportáteis</h3>
+<pre><code>Churrasqueira → Air Fryer → Sanduicheira
+</code></pre>
+<h3 id="44-cozinha-eletrodomesticos">4.4 Cozinha / Eletrodomésticos</h3>
+<pre><code>Cooktop → Micro-ondas → Liquidificador
+</code></pre>
+<blockquote>
+<p>Os clientes apresentam <strong>padrões de compra semelhantes, mas não idênticos</strong>, viabilizando testes realistas de similaridade.</p>
+</blockquote>
+<hr />
+<h2 id="5-casos-de-uso-habilitados">5. Casos de Uso Habilitados</h2>
+<p>Com essa base é possível começar a testar:</p>
+<ol>
+<li>
+<p><strong>Recomendação por produto adicionado</strong></p>
+<blockquote>
+<p><em>"O cliente adicionou um ar-condicionado. Quais produtos semelhantes ou complementares eu poderia sugerir?"</em></p>
+</blockquote>
+</li>
+<li>
+<p><strong>Recomendação por coocorrência</strong></p>
+<blockquote>
+<p><em>"Clientes que compraram este produto também costumam comprar o quê?"</em></p>
+</blockquote>
+</li>
+<li>
+<p><strong>Busca semântica por similaridade</strong></p>
+<blockquote>
+<p><em>"Encontre pedidos semanticamente parecidos com o pedido atual."</em></p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="6-proximos-passos">6. Próximos Passos</h2>
+<p>Pipeline planejado para evolução da solução:</p>
+<ol>
+<li><strong>Base fictícia</strong> → ambiente de testes seguro</li>
+<li><strong>Preparação dos dados</strong> → limpeza, normalização e tipagem</li>
+<li><strong>Embeddings / busca semântica</strong> → indexação para RAG</li>
+<li><strong>Agente</strong> → núcleo agêntico com LangGraph</li>
+<li><strong>API</strong> → exposição via FastAPI</li>
+<li><strong>Tomcat</strong> → servidor de aplicação (se aplicável)</li>
+<li><strong>Android</strong> → cliente final (se aplicável)</li>
+</ol>
+<blockquote>
+<p>Quando o agente estiver validado na base fictícia, basta trocar a fonte de dados pela integração real (WebService do ERP) para iniciar a validação em produção.</p>
+</blockquote></main></body></html>
