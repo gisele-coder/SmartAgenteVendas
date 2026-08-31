@@ -1,0 +1,99 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-5-observabilidade | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-5-observabilidade.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 5 — Observabilidade</p>
+<hr />
+<h1 id="fase-5-observabilidade">Fase 5 — Observabilidade</h1>
+<blockquote>
+<p>Objetivo: produzir e correlacionar pelo menos dois sinais de observabilidade, permitindo investigar e reconstruir execuções (brief 4.6).</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li><strong>Confirmação de sequência:</strong><blockquote>
+<p>"sim" — aprovação de executar a Parte 4 antes da 5 e, concluída a 4, seguir para a Parte 5 conforme plano</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="sinal-1-logs-estruturados-json-appobservabilitylogging_configpy">Sinal 1 — Logs estruturados JSON (<code>app/observability/logging_config.py</code>)</h3>
+<ul>
+<li>Logger dedicado <code>smartorder.flow</code> com formatter JSON; <code>log_flow(request_id, node, latency_ms, **extra)</code> emite 1 linha por node com latência e contexto (itens, contagem, status, tipo de bloqueio)</li>
+<li><code>setup_logging()</code> configura handler de console + <code>logs/execution.log</code> (gitignored); idempotente</li>
+<li>Cada node registra: <code>validate_input</code>, <code>security_check</code>, <code>get_purchase_history</code>, <code>find_similar_products</code>, <code>generate_recommendations</code>, <code>validate_recommendations</code>, <code>block_request</code>, <code>finalize_response</code></li>
+</ul>
+<h3 id="sinal-2-metricas-appobservabilitymetricspy">Sinal 2 — Métricas (<code>app/observability/metrics.py</code>)</h3>
+<ul>
+<li>Contadores thread-safe (<code>threading.Lock</code>): runs/success/blocked/error/fallback/recomendações</li>
+<li>Latências: total e de tool (avg/max) + taxas (<code>block_rate</code>, <code>fallback_rate</code>)</li>
+<li>Endpoint <strong><code>GET /metrics</code></strong> expõe o snapshot</li>
+<li><code>record_run</code> chamado no <code>run_recommendation</code> (builder) com latência total medida e soma das tools paralelas (<code>history_ms</code> + <code>similar_ms</code>)</li>
+</ul>
+<h3 id="terceiro-sinal-da-fase-4">Terceiro sinal (da fase 4)</h3>
+<ul>
+<li>Audit JSONL (<code>logs/audit.jsonl</code>) — eventos por node com <code>request_id</code></li>
+</ul>
+<h3 id="insumo-para-a-parte-7-anomalias">Insumo para a Parte 7 (anomalias)</h3>
+<ul>
+<li><code>settings.tool_delay_ms</code> (padrão 0): delay simulável dentro das tools — permite gerar anomalia de latência real e capturá-la nas métricas</li>
+</ul>
+<h3 id="bug-de-langgraph-encontrado">Bug de LangGraph encontrado</h3>
+<ul>
+<li>Nodes retornavam <code>history_ms</code>/<code>similar_ms</code>, mas as chaves <strong>não estavam declaradas no <code>RecommendationState</code></strong> → LangGraph silenciosamente as descartava (métrica de tool sempre 0). Correção: declaração no TypedDict + teste que falhava sem ela (<code>test_tool_delay_aparece_nas_metricas</code>)</li>
+</ul>
+<h3 id="tratamento-de-falhas-brief-46">Tratamento de falhas (brief 4.6)</h3>
+<ul>
+<li>LLM: timeout 30 s + max_retries 2 (config) + fallback determinístico (coocorrência) — demonstrado em execução real (<code>obs-real-003</code>)</li>
+<li>Tool: leitura local determinística; timeout não aplicável ao domínio (documentado); falha → erro estruturado com audit</li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>41 passed</strong> (7 novos em <code>test_observability.py</code>: métricas de sucesso/bloqueio/erro/fallback, delay na métrica, log JSON via caplog, logs por node no grafo, endpoint <code>/metrics</code>)</td>
+</tr>
+<tr>
+<td>Evidência real</td>
+<td>3 execuções com 3 sinais correlacionados arquivadas em <a href="../../evidencias/execucoes/observabilidade-fase-5.html"><code>evidencias/execucoes/observabilidade-fase-5.md</code></a></td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/observabilidade</code></td>
+</tr>
+</tbody>
+</table></main></body></html>

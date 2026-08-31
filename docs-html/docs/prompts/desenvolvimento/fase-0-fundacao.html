@@ -1,0 +1,149 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-0-fundacao | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-0-fundacao.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 0 — Fundação</p>
+<hr />
+<h1 id="fase-0-fundacao">Fase 0 — Fundação</h1>
+<blockquote>
+<p>Objetivo: preparar repositório, ambiente, scaffold e a configuração do LLM, com segurança de credenciais desde o primeiro commit.</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li>
+<p><strong>Solicitação inicial de planejamento:</strong></p>
+<blockquote>
+<p>"Leia os documentos e me ajude a planejar esta ideia de projeto por partes até sua finalização baseado na ideia de um agente de vendas com a base de dados de uma planilha que já está na pasta que é uma ideia que pretendo usar em um cliente posteriormente mas, este projeto precisa atender aos requisitos do trabalho descrito no documento de projeto avaliativo."</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Respostas de definição de escopo</strong> (via questionário):
+   - Modalidade: <strong>individual</strong> (correção aplicada ao <code>Planejamento.md</code>, que mencionava dupla)
+   - LLM: inicialmente "modelo local/outro" → alterado para <strong>API key do OpenCode</strong> ("vou usar uma apikey do opencode que tenho, mudei de ideia")
+   - Low-code: <strong>N8N Cloud</strong> (trial grátis)
+   - Formato: <strong>API local (FastAPI)</strong></p>
+</li>
+<li>
+<p><strong>Estado do repositório:</strong></p>
+<blockquote>
+<p>"O git eu já sincronizei com a main"
+   (verificado: repo <code>gisele-coder/SmartAgenteVendas</code>, 1 commit na <code>main</code>; criada branch <code>develop</code>)</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Fornecimento da chave e solicitação de configuração:</strong></p>
+<blockquote>
+<p>"Foi fornecida uma chave de API do OpenCode para configuração temporária (valor omitido por segurança)."</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Aprovação da execução da Parte 0:</strong></p>
+<blockquote>
+<p>"sim"</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Solicitação de registro de evidências:</strong></p>
+<blockquote>
+<p>"Preciso que já salvando os prompts de cada fase desenvolvida para comprovação do trabalho antes de prosseguir."
+   (gerou esta subpasta <code>desenvolvimento/</code> e a regra de processo por fase)</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="decisoes-de-arquitetura">Decisões de arquitetura</h3>
+<ul>
+<li>Stack fixada: Python 3.11+, LangGraph, FastAPI, Pydantic v2, pandas+openpyxl, pytest, ruff, GitHub Actions, N8N Cloud</li>
+<li>Plano em 9 partes com rastreabilidade aos 15 critérios do brief (seção 6)</li>
+<li>Fluxo de git: <code>main</code> + <code>develop</code> + feature branches (conforme seção 5.4 do brief)</li>
+</ul>
+<h3 id="descoberta-e-configuracao-do-llm-evidencia-de-depuracao">Descoberta e configuração do LLM (evidência de depuração)</h3>
+<ol>
+<li><code>GET /v1/models</code> na gateway OpenCode — lista de 66 modelos retornada com sucesso</li>
+<li>Primeiro teste (<code>gpt-5.4-nano</code>) → <strong><code>CreditsError: Insufficient balance</code></strong> — conta sem saldo para modelos pagos</li>
+<li>Teste de modelos gratuitos:
+   - <code>deepseek-v4-flash-free</code> → indisponível ("Model is unavailable")
+   - <code>mimo-v2.5-free</code> → <strong>inutilizável</strong> (<code>content: null</code>, só reasoning)
+   - <code>nemotron-3.5-lightning-free</code> → funcional (plano B)
+   - <code>hy3-free</code> → funcional, conciso → <strong>escolhido como principal</strong></li>
+<li>Config final: <code>LLM_BASE_URL=https://opencode.ai/zen/v1</code>, <code>LLM_MODEL=hy3-free</code>, troca de modelo exclusivamente por variável de ambiente (seção 4.10 do brief)</li>
+</ol>
+<h3 id="correcoes-durante-a-execucao">Correções durante a execução</h3>
+<ul>
+<li><code>pip install -e .</code> falhou: <em>"Multiple top-level packages discovered in a flat-layout: ['app', 'data']"</em></li>
+<li>Correção: <code>[tool.setuptools] packages = ["app"]</code> no <code>pyproject.toml</code></li>
+<li><code>curl</code> no PowerShell falhou (alias <code>Invoke-WebRequest</code>) → substituído por <code>curl.exe</code></li>
+</ul>
+<h3 id="seguranca-aplicada">Segurança aplicada</h3>
+<ul>
+<li><code>.gitignore</code> criado <strong>antes</strong> de qualquer commit de código, com <code>.env</code> protegido</li>
+<li><code>LLM_API_KEY</code> real apenas no <code>.env</code> local (gitignored); <code>.env.example</code> com valor vazio</li>
+<li>Recomendação registrada: revogar/trocar a chave após a entrega (ficou exposta em conversa)</li>
+</ul>
+<h3 id="reorganizacao">Reorganização</h3>
+<ul>
+<li>Planilha movida de <code>docs/</code> para <code>data/</code>; referências atualizadas em <code>docs/README.md</code>, <code>estrutura_planilha.md</code> e <code>sobre_a_planilha.md</code></li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commit <code>191733c</code></td>
+<td><code>chore: organiza documentacao, move base para data/ e adiciona gitignore</code> (10 files)</td>
+</tr>
+<tr>
+<td>Commit <code>ee97ca9</code></td>
+<td><code>feat: configura esqueleto do projeto com fastapi, factory de llm e testes</code> (10 files)</td>
+</tr>
+<tr>
+<td>Push</td>
+<td>branch <code>develop</code> publicada em <code>origin</code></td>
+</tr>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>2 passed</strong> (<code>test_health</code>, <code>test_llm_smoke</code> — conectividade LLM real)</td>
+</tr>
+<tr>
+<td>Lint</td>
+<td><code>ruff check .</code> → <strong>All checks passed</strong></td>
+</tr>
+<tr>
+<td><code>.env</code></td>
+<td><strong>não versionado</strong> (confirmado via <code>git status</code> limpo)</td>
+</tr>
+</tbody>
+</table></main></body></html>

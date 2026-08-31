@@ -1,0 +1,105 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>tendencia-risco-2026-08-29 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/evidencias/metricas/tendencia-risco-2026-08-29.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="estimativa-de-tendencia-e-risco-de-falha-29082026">Estimativa de Tendência e Risco de Falha — 29/08/2026</h1>
+<blockquote>
+<p>Critério 13 do brief: "produzir uma estimativa simples de tendência, risco ou probabilidade de falha, utilizando dados reais ou simulados e documentados".</p>
+</blockquote>
+<h2 id="dados-utilizados">Dados utilizados</h2>
+<p>Série da anomalia documentada (<a href="../anomalias/anomalia-tool-latency-2026-08-29.html"><code>../anomalias/anomalia-tool-latency-2026-08-29.md</code></a>): latência do node <code>get_purchase_history</code> em 8 execuções consecutivas (logs JSON reais, correlacionados por <code>request_id</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Run (x)</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+<th>7</th>
+<th>8</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Latência (ms)</td>
+<td>2,2</td>
+<td>2,1</td>
+<td>2,0</td>
+<td>2,7</td>
+<td>302,9</td>
+<td>603,0</td>
+<td>903,3</td>
+<td>1203,5</td>
+</tr>
+</tbody>
+</table>
+<h2 id="modelo-regressao-linear-simples-minimos-quadrados">Modelo — regressão linear simples (mínimos quadrados)</h2>
+<ul>
+<li><strong>Inclinação global</strong>: <strong>+178,8 ms/execução</strong> (Sxy/Sxx = 7509,3/42)</li>
+<li><strong>Inclinação pós-início da anomalia (runs 4→8)</strong>: <strong>+300,2 ms/execução</strong> (cenário conservador, assume que a degradação continua no mesmo ritmo)</li>
+<li>Interseção global: -426,9 ms (o modelo linear global subestima o início, mas captura a tendência)</li>
+</ul>
+<h2 id="projecao">Projeção</h2>
+<table>
+<thead>
+<tr>
+<th>Cenário</th>
+<th style="text-align: right;">Run 9</th>
+<th style="text-align: right;">Run 10</th>
+<th style="text-align: right;">Run 11</th>
+<th>SLA 2 s excedido em</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Global (178,8 ms/run)</td>
+<td style="text-align: right;">1.182 ms</td>
+<td style="text-align: right;">1.361 ms</td>
+<td style="text-align: right;">1.540 ms</td>
+<td>~run 14</td>
+</tr>
+<tr>
+<td><strong>Conservador (300,2 ms/run)</strong></td>
+<td style="text-align: right;">1.504 ms</td>
+<td style="text-align: right;">1.804 ms</td>
+<td style="text-align: right;"><strong>2.104 ms</strong></td>
+<td><strong>~run 11</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="estimativa-de-risco">Estimativa de risco</h2>
+<p><strong>Risco: ALTO — SLA de 2 s por execução é violado em ~3 execuções se a tendência linear continuar.</strong></p>
+<p>Justificativa:
+1. O padrão é <strong>linear e determinístico</strong> (R² de fato na série pós-run-4 ≈ 1,0: cada +300 ms exatos), não ruído — degradação real de recurso, não flakiness
+2. Com o modelo atual (sem timeout na camada de dados), a execução <strong>não falha — só fica lenta</strong>, mascarando o problema nos contadores de erro (0 erros em 8 runs) — por isso a métrica de <strong>latência</strong> é o sinal crítico
+3. Pressupostos declarados: série simulada controlada; em produção a forma da curva (linear vs exponencial) dependeria da causa raiz</p>
+<h2 id="acoes-preventivas-propostas-monitoramento">Ações preventivas propostas (monitoramento)</h2>
+<ol>
+<li><strong>Alerta imediato</strong>: <code>tool_ms_total &gt; 20 ms</code> (10× baseline) dispara webhook para o N8N (Parte 8)</li>
+<li><strong>Timeout na camada de dados</strong> ao migrar para o ERP real (ex.: 2 s) — converte degradação em falha estruturada, visível nas métricas de erro</li>
+<li><strong>Revisar tendência a cada N execuções</strong>: reajustar a regressão online; slope &gt; 100 ms/run sustentado = incidente</li>
+</ol></main></body></html>

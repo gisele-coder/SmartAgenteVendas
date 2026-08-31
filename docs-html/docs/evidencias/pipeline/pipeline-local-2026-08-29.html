@@ -1,0 +1,46 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>pipeline-local-2026-08-29 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/evidencias/pipeline/pipeline-local-2026-08-29.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="pipeline-execucao-local-mesmos-passos-do-ci-29082026">Pipeline — Execução local (mesmos passos do CI) — 29/08/2026</h1>
+<p><strong>Workflow:</strong> <code>.github/workflows/ci.yml</code> (push dispara o CI real no GitHub Actions) · <strong>Pipeline local executado</strong> com os mesmos 3 estágios para captura e análise dos logs pela IA.</p>
+<hr />
+<h2 id="etapa-1-lint-ruff">Etapa 1 — Lint (ruff)</h2>
+<pre><code class="language-text">===== ETAPA 1: LINT =====
+All checks passed!
+exit=0
+</code></pre>
+<p><strong>Análise da IA:</strong> o linter não encontrou nenhuma violação em 446+ instruções (erros E/F/I/UP/B habilitados, line-length 100, prompts com E501 ignorado de propósito). Zero avisos silenciados com <code>noqa</code> no diff principal — o estágio é estável e não flaky por natureza (determinístico). Risco de falha futura: baixo, restrito a novos códigos.</p>
+<h2 id="etapa-2-testes-pytest-com-cobertura">Etapa 2 — Testes (pytest, com cobertura)</h2>
+<pre><code class="language-text">42 passed in ~7s
+exit=0
+</code></pre>
+<p><strong>Análise da IA:</strong> suite 100% verde, ~7 s (nenhum teste de rede — FakeLLM injetado via DI; o único teste com rede, <code>test_llm_smoke</code>, roda apenas quando <code>LLM_API_KEY</code> existe — no CI chega via <strong>secret</strong>, nunca hardcoded). Duração estável entre execuções anteriores (5,8–7 s) → sem flakiness. Cobertura 95% documentada em <a href="../../qa/relatorios/relatorio-cobertura-2026-08-29.html"><code>qa/relatorios/</code></a>.</p>
+<h2 id="etapa-3-build-wheel">Etapa 3 — Build (wheel)</h2>
+<pre><code class="language-text">artefato: smartorder_ai-0.1.0-py3-none-any.whl (3.5 KB)
+exit=0
+</code></pre>
+<p><strong>Análise da IA:</strong> o wheel buildou com sucesso — valida empacotamento (<code>packages = ["app"]</code>), dependências declaradas no <code>pyproject.toml</code> e ausência de imports fora do pacote. Artefato pequeno (3,5 KB) porque dados/xlsx ficam fora do pacote (correto: trocáveis pelo ERP real).</p>
+<h2 id="conclusao">Conclusão</h2>
+<p>Pipeline <strong>3/3 etapas verdes</strong>. Pontos de atenção registrados pela IA: (1) o CI usa <code>python-version: 3.12</code> enquanto o local é 3.14 — risco de divergência de comportamento é baixo (código compatível ≥3.11), monitorado pelo próprio CI; (2) secret <code>LLM_API_KEY</code> precisa estar configurada no repositório para o smoke test rodar no CI.</p></main></body></html>

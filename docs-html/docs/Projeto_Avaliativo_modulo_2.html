@@ -1,0 +1,556 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Projeto_Avaliativo_modulo_2 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/Projeto_Avaliativo_modulo_2.md</span><span>· <a href="../index.html">início</a></span></nav><hr />
+<p>origem: brief institucional (AVA — IA PARA DESENVOLVEDORES)
+status: referência
+codigo: Projeto Avaliativo – M2.2
+peso: 60% da nota do módulo
+liberacao: 2026-08-21 22h
+entrega: 2026-08-31 15h</p>
+<hr />
+<h1 id="ia-para-desenvolvedores-t1">IA PARA DESENVOLVEDORES [T1]</h1>
+<p><strong>Situação de Aprendizagem (Projeto Avaliativo) — Módulo 2 — Semana 12</strong></p>
+<hr />
+<h2 id="sumario">Sumário</h2>
+<ol>
+<li><a href="#1-contextualizacao">Contextualização</a></li>
+<li><a href="#2-desafio">Desafio</a></li>
+<li><a href="#3-resultados-esperados-entrega">Resultados Esperados (Entrega)</a></li>
+<li><a href="#4-requisitos-da-aplicacao">Requisitos da Aplicação</a>
+   - 4.1. <a href="#41-domínio-escopo-e-cenários">Domínio, escopo e cenários</a>
+   - 4.2. <a href="#42-arquitetura-agêntica-e-langgraph">Arquitetura agêntica e LangGraph</a>
+   - 4.3. <a href="#43-tools-mcp-e-integrações">Tools, MCP e integrações</a>
+   - 4.4. <a href="#44-memória-contexto-e-rag">Memória, contexto e RAG</a>
+   - 4.5. <a href="#45-segurança-governança-e-limites-de-autonomia">Segurança, governança e limites de autonomia</a>
+   - 4.6. <a href="#46-observabilidade-e-resiliência">Observabilidade e resiliência</a>
+   - 4.7. <a href="#47-ia-para-qa-e-testes-inteligentes">IA para QA e testes inteligentes</a>
+   - 4.8. <a href="#48-devops-inteligente-e-detecção-de-falhas">DevOps inteligente e detecção de falhas</a>
+   - 4.9. <a href="#49-low-code-para-qa-sre-e-agentes">Low-Code para QA, SRE e agentes</a>
+   - 4.10. <a href="#410-prompts-modelos-e-refinamento">Prompts, modelos e refinamento</a></li>
+<li><a href="#5-roteiro-da-aplicacao">Roteiro da Aplicação</a>
+   - 5.1. <a href="#51-formato-do-sistema">Formato do sistema</a>
+   - 5.2. <a href="#52-documentação-no-readmemd">Documentação no README.md</a>
+   - 5.3. <a href="#53-uso-do-quadro-do-github">Uso do quadro do GitHub</a>
+   - 5.4. <a href="#54-uso-do-repositório-no-github">Uso do repositório no GitHub</a>
+   - 5.5. <a href="#55-gravação-de-vídeo">Gravação de vídeo</a></li>
+<li><a href="#6-critérios-de-avaliação">Critérios de Avaliação</a></li>
+<li><a href="#7-checklist-final-de-entrega">Checklist Final de Entrega</a></li>
+</ol>
+<hr />
+<h2 id="1-contextualizacao">1. Contextualização</h2>
+<p>Sistemas de inteligência artificial deixaram de atuar apenas como assistentes conversacionais e passaram a executar tarefas, consultar dados, utilizar ferramentas, manter memória e coordenar fluxos de múltiplas etapas. Essa evolução amplia o valor da IA no desenvolvimento de software, mas também introduz novos riscos: uma ferramenta pode receber parâmetros inválidos, um loop pode não terminar, uma memória pode recuperar contexto inadequado, uma ação pode ultrapassar o nível de autonomia permitido e uma execução aparentemente correta pode esconder falhas, tentativas repetidas ou decisões sem rastreabilidade.</p>
+<p>Ao longo do Módulo 2, foram estudados os fundamentos de agentes, a diferença entre assistentes, agentes e workflows, o uso de tools e MCP, a construção de fluxos com LangGraph, memória curta e longa, RAG, integrações com APIs, segurança, governança, automação de CI/CD e ChatOps, arquitetura escalável, observabilidade, revisão de código, testes inteligentes, detecção de falhas e automações low-code.</p>
+<p>Neste projeto avaliativo, você deverá desenvolver uma aplicação funcional em qualquer domínio de negócio, desde que o uso de IA esteja presente na solução e seja demonstrado nas atividades previstas neste projeto. Você poderá dar continuidade à aplicação desenvolvida no mini-projeto do módulo, evoluindo-a de forma coerente e sem a necessidade de criar um sistema excessivamente grande.</p>
+<p>O objetivo não é acumular funcionalidades, mas construir uma solução funcional, demonstrável e tecnicamente explicável. O projeto deverá evidenciar como a entrada percorre o fluxo, como o agente toma decisões, quais tools são utilizadas, como o contexto é mantido ou recuperado, quais controles impedem comportamentos inseguros, como a qualidade é verificada e quais sinais permitem investigar o funcionamento da solução.</p>
+<hr />
+<h2 id="2-desafio">2. Desafio</h2>
+<p>Você deverá desenvolver ou evoluir uma aplicação funcional com agentes de IA, em qualquer domínio de negócio, integrando os conteúdos essenciais do Módulo 2. A solução deverá receber uma solicitação, evento ou conjunto de dados, executar um fluxo com múltiplas etapas, utilizar ferramentas ou serviços, produzir uma saída estruturada e registrar evidências suficientes para que outra pessoa consiga compreender, testar e reproduzir seu comportamento.</p>
+<p>A solução poderá ser derivada do mini-projeto já desenvolvido. Nesse caso, você deverá demonstrar claramente quais capacidades foram mantidas, quais foram refatoradas e quais evoluções foram adicionadas para atender aos requisitos deste projeto final.</p>
+<p>Diante disso, você deverá:</p>
+<ul>
+<li>Definir um problema real ou plausível, seus usuários, entradas, saídas, riscos e critérios de sucesso;</li>
+<li>Explicar se a solução é um agente, um workflow determinístico ou um sistema híbrido, justificando essa classificação;</li>
+<li>Modelar o fluxo principal com LangGraph, utilizando estado compartilhado, nodes, edges e controle explícito de execução;</li>
+<li>Implementar pelo menos uma tool funcional integrada por MCP, API, serviço, backend ou webhook, com validação de entradas e tratamento de erros;</li>
+<li>Implementar estratégia de memória e recuperação contextual adequada ao domínio;</li>
+<li>Aplicar segurança, governança, limites de autonomia, controle de looping e aprovação humana quando necessária;</li>
+<li>Produzir e correlacionar pelo menos dois sinais de observabilidade que permitam investigar e reconstruir uma execução;</li>
+<li>Aplicar IA em revisão de código, geração ou refinamento de testes e priorização orientada por risco;</li>
+<li>Integrar práticas de DevOps inteligente, incluindo explicação de logs, detecção de anomalias e estimativa de tendência ou risco de falha;</li>
+<li>Adicionar ao menos uma integração low-code ou no-code para QA, SRE, automação ou construção visual de agentes;</li>
+<li>Documentar prompts, decisões, limitações, testes e evidências de execução.</li>
+</ul>
+<hr />
+<h2 id="3-resultados-esperados-entrega">3. Resultados Esperados (Entrega)</h2>
+<p>A atividade será realizada individualmente. Cada estudante será responsável pelo planejamento, desenvolvimento, documentação, testes, organização do GitHub e demonstração da própria solução, mantendo evidências reais da evolução do trabalho por meio de cards, commits, branches, pull requests, testes, prompts e demais artefatos produzidos.</p>
+<p>O código deverá ser inserido e versionado em um repositório no GitHub, que poderá ser criado na conta pessoal do estudante, e o planejamento deverá ser realizado em um GitHub Project no formato Kanban. O professor deverá receber acesso aos artefatos necessários para a avaliação. Os links do repositório, do quadro e do vídeo deverão ser submetidos na atividade correspondente do AVA.</p>
+<p>A entrega será composta pelos seguintes artefatos principais:</p>
+<ul>
+<li>Repositório no GitHub com código, testes, workflows, documentação e histórico de desenvolvimento;</li>
+<li>Quadro Kanban do GitHub atualizado durante o projeto;</li>
+<li>README.md completo, com instruções de instalação, configuração, execução e descrição da solução;</li>
+<li>Documentação e evidências técnicas necessárias para demonstrar as principais decisões, refinamentos, testes, observabilidade, análise de falhas e integração low-code/no-code;</li>
+<li>Vídeo de demonstração publicado no YouTube como não listado.</li>
+</ul>
+<p><strong>Dados da avaliação:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Peso do projeto</td>
+<td>Avaliação M2.2 — 60% da nota do módulo</td>
+</tr>
+<tr>
+<td>Data de liberação</td>
+<td>21/08/26 às 22h</td>
+</tr>
+<tr>
+<td>Data de entrega</td>
+<td>31/08/26 até às 15h</td>
+</tr>
+<tr>
+<td>Submissão no AVA</td>
+<td>Projeto Avaliativo – M2.2</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-requisitos-da-aplicacao">4. Requisitos da Aplicação</h2>
+<p>O desenvolvimento da aplicação funcional pode ser feito em qualquer domínio de negócio, desde que o uso de IA esteja presente na solução e seja demonstrado nas atividades previstas neste projeto. As tecnologias poderão ser definidas de acordo com o domínio escolhido. A avaliação considerará a coerência entre o problema, a arquitetura, o nível de autonomia, os mecanismos de qualidade e as evidências apresentadas.</p>
+<h3 id="41-dominio-escopo-e-cenarios">4.1. Domínio, escopo e cenários</h3>
+<ul>
+<li>O problema, o público, as entradas, as saídas e os limites da solução deverão estar descritos no README.md.</li>
+<li>A aplicação deverá possuir lógica funcional compatível com o problema escolhido, sem depender exclusivamente de respostas fixas no código.</li>
+<li>Deverão ser demonstrados pelo menos dois cenários de uso, sendo um fluxo principal e um cenário de risco, falha, exceção ou comportamento anômalo.</li>
+<li>A saída principal deverá ser estruturada e adequada ao domínio, podendo utilizar JSON, modelo Pydantic, tabela, relatório, contrato de API ou formato equivalente.</li>
+</ul>
+<h3 id="42-arquitetura-agentica-e-langgraph">4.2. Arquitetura agêntica e LangGraph</h3>
+<ul>
+<li>Implementar o fluxo principal com LangGraph, utilizando estado compartilhado tipado, nodes com responsabilidades claras e edges explícitas.</li>
+<li>O fluxo deverá contemplar execução sequencial, ramificação condicional e ao menos uma paralelização simples.</li>
+<li>Definir condições de continuidade e parada, evitando loops indefinidos e execuções desnecessárias.</li>
+<li>Manter clara a separação entre decisões realizadas pelo modelo e regras determinísticas da aplicação.</li>
+</ul>
+<h3 id="43-tools-mcp-e-integracoes">4.3. Tools, MCP e integrações</h3>
+<ul>
+<li>Implementar pelo menos uma tool funcional, com entradas e saídas bem definidas, integrada por MCP, API, serviço, backend ou webhook, incluindo validação de payloads, parâmetros e schemas e tratamento de falhas;</li>
+<li>Ações destrutivas ou irreversíveis deverão ser simuladas, bloqueadas ou condicionadas à aprovação humana, quando aplicável ao domínio.</li>
+</ul>
+<h3 id="44-memoria-contexto-e-rag">4.4. Memória, contexto e RAG</h3>
+<ul>
+<li>Implementar uma estratégia de memória ou recuperação contextual adequada ao domínio da aplicação, utilizando recursos como state, checkpointer, armazenamento persistente ou RAG.</li>
+<li>A estratégia adotada deverá permitir que a solução utilize informações relevantes da própria execução, de interações anteriores ou de uma fonte externa, conforme a necessidade do domínio.</li>
+<li>Quando utilizar RAG, documentar resumidamente a base, o chunking, a indexação, a recuperação e as fontes. Para outras fontes externas, indicar a origem das informações e como são recuperadas.</li>
+</ul>
+<h3 id="45-seguranca-governanca-e-limites-de-autonomia">4.5. Segurança, governança e limites de autonomia</h3>
+<ul>
+<li>Proteger credenciais e informações sensíveis, mantendo segredos fora do repositório, e validar permissões antes da execução de tools ou ações externas.</li>
+<li>Definir limites de autonomia coerentes com o domínio, determinando quando uma ação poderá ser executada, bloqueada ou depender de aprovação humana.</li>
+<li>Implementar e demonstrar pelo menos um cenário adversarial envolvendo prompt injection ou entrada não confiável, comprovando que conteúdos externos não substituem as regras da aplicação, ações não autorizadas não são executadas e informações sensíveis não são reveladas.</li>
+</ul>
+<h3 id="46-observabilidade-e-resiliencia">4.6. Observabilidade e resiliência</h3>
+<ul>
+<li>Produzir e correlacionar pelo menos dois sinais de observabilidade, sendo um deles logs estruturados e o outro podendo ser trace, métrica ou registro de auditoria;</li>
+<li>Utilizar esses sinais para investigar pelo menos uma execução da aplicação, permitindo identificar seu fluxo, decisões relevantes, erros e latência, quando disponível.</li>
+<li>Aplicar tratamento básico de falhas nas integrações externas, como timeout, retry limitado ou fallback, quando aplicável ao domínio.</li>
+</ul>
+<h3 id="47-ia-para-qa-e-testes-inteligentes">4.7. IA para QA e testes inteligentes</h3>
+<ul>
+<li>Utilizar IA para analisar pelo menos uma alteração real do projeto, como um diff, trecho de código ou Pull Request real, identificando possíveis problemas ou oportunidades de melhoria;</li>
+<li>Gerar ou refinar testes automatizados com apoio de IA, cobrindo cenários relevantes da aplicação e incluindo pelo menos um dos seguintes tipos de teste: integração, aceitação ou E2E (end-to-end).</li>
+<li>Selecionar e justificar pelo menos um teste ou cenário considerado prioritário com base em risco, impacto ou criticidade.</li>
+</ul>
+<h3 id="48-devops-inteligente-e-deteccao-de-falhas">4.8. DevOps inteligente e detecção de falhas</h3>
+<ul>
+<li>Configurar um pipeline que execute lint, testes e build ou validação equivalente. O deploy da aplicação não será obrigatório;</li>
+<li>Utilizar IA para analisar e explicar logs de pelo menos duas etapas entre CI, Dockerfile, lint, testes, build e, quando houver, CD ou deploy;</li>
+<li>Detectar e explicar pelo menos uma anomalia, como erro recorrente, latência alta, falha de tool ou aumento da taxa de erro;</li>
+<li>Produzir uma estimativa simples de tendência, risco ou probabilidade de falha, utilizando dados reais ou simulados e documentados;</li>
+<li>Apresentar as evidências utilizadas e justificar a conclusão obtida na análise da falha ou do risco identificado.</li>
+</ul>
+<h3 id="49-low-code-para-qa-sre-e-agentes">4.9. Low-Code para QA, SRE e agentes</h3>
+<ul>
+<li>Você deverá implementar uma automação low-code ou no-code integrada à solução principal. Não será necessário reconstruir a aplicação na ferramenta visual.</li>
+<li>O fluxo deverá possuir ao menos um gatilho, integrar-se à aplicação ou a um de seus serviços e produzir uma saída observável, como alerta, relatório, registro, comentário ou resposta;</li>
+<li>A lógica principal deverá permanecer na aplicação, enquanto a ferramenta visual deverá atuar como apoio à orquestração ou integração;</li>
+<li>O fluxo deverá possuir instruções resumidas de reprodução no README.md.</li>
+<li><strong>Extensão opcional:</strong> o aluno poderá utilizar ChatOps ou outro mecanismo de notificação para comunicar resultados, alertas ou diagnósticos produzidos pela aplicação, utilizando, por exemplo, Discord, Slack, Microsoft Teams, e-mail, GitHub Issue ou webhook.</li>
+</ul>
+<h3 id="410-prompts-modelos-e-refinamento">4.10. Prompts, modelos e refinamento</h3>
+<ul>
+<li>Manter documentadas no projeto as principais instruções de sistema utilizadas pelo agente, incluindo regras de comportamento, objetivos da tarefa, restrições importantes e padrões de resposta esperados, além dos prompts relevantes que orientam o funcionamento da solução;</li>
+<li>Configurar o modelo utilizado por meio de variável de ambiente, evitando credenciais ou informações sensíveis no código;</li>
+<li>Documentar pelo menos um ciclo de refinamento de prompt ou comportamento do agente, apresentando o problema observado, a alteração realizada e o resultado obtido.</li>
+</ul>
+<hr />
+<h2 id="5-roteiro-da-aplicacao">5. Roteiro da Aplicação</h2>
+<p>A seguir estão os requisitos de organização e apresentação da entrega. A estrutura poderá ser adaptada ao domínio, mas deverá permitir que o avaliador localize rapidamente o código do agente, as integrações, os testes, as políticas, os workflows e as evidências.</p>
+<h3 id="51-formato-do-sistema">5.1. Formato do sistema</h3>
+<p>Você poderá escolher o formato da aplicação, desde que a solução seja executável, demonstrável e documentada. São formatos aceitáveis:</p>
+<ul>
+<li>Aplicação de linha de comando;</li>
+<li>API local com FastAPI, Flask ou tecnologia equivalente;</li>
+<li>Interface simples com Gradio, Streamlit ou aplicação web;</li>
+<li>Aplicação integrada a serviços externos ou automações.</li>
+</ul>
+<p>Outros formatos poderão ser utilizados desde que sejam adequados ao domínio e permitam demonstrar os requisitos do projeto.</p>
+<p>Notebooks poderão ser utilizados apenas como apoio à experimentação ou como demonstração auxiliar, não como formato principal da aplicação entregue.</p>
+<p>A solução deverá possuir dados de exemplo e instruções suficientes para reproduzir os cenários demonstrados. Credenciais, chaves de API, tokens e outras informações sensíveis não deverão ser incluídas no repositório, no AVA ou nos demais artefatos entregues. Quando necessário, deverá ser disponibilizado um <code>.env.example</code> sem valores reais.</p>
+<h3 id="52-documentacao-no-readmemd">5.2. Documentação no README.md</h3>
+<p>Crie um arquivo <code>README.md</code> no repositório do projeto no GitHub para documentar a solução, apresentar as principais decisões técnicas e permitir que outra pessoa compreenda, configure, execute e avalie a aplicação.</p>
+<p>O <code>README.md</code> deverá funcionar como guia do projeto e conter obrigatoriamente:</p>
+<ul>
+<li><strong>Descrição da solução:</strong> nome do projeto, problema resolvido, público, objetivo e valor entregue. Quando houver continuidade do mini-projeto, indicar brevemente quais capacidades foram mantidas ou evoluídas;</li>
+<li><strong>Classificação e arquitetura:</strong> classificar a solução como agente, workflow determinístico ou sistema híbrido e apresentar um diagrama da arquitetura, destacando o fluxo LangGraph, seus principais nodes, rotas, paralelização e componentes envolvidos;</li>
+<li><strong>Tool e integração:</strong> descrever a tool implementada e sua integração, como MCP, API, serviço, backend ou webhook, indicando resumidamente sua finalidade no fluxo;</li>
+<li><strong>Contexto e memória:</strong> explicar a estratégia de memória ou recuperação contextual adotada, como state, checkpointer, armazenamento persistente ou RAG, e como essas informações são utilizadas pela aplicação;</li>
+<li><strong>Segurança e autonomia:</strong> apresentar os principais controles de segurança, proteção de credenciais, validações, limites de autonomia, bloqueios e aprovação humana quando aplicável, incluindo o comportamento esperado diante de uma entrada adversarial ou prompt injection;</li>
+<li><strong>Instalação e execução:</strong> fornecer instruções de configuração, instalação, execução e testes, incluindo as variáveis de ambiente necessárias por meio de <code>.env.example</code>, sem expor credenciais, tokens ou informações sensíveis;</li>
+<li><strong>QA, observabilidade e DevOps:</strong> apresentar as principais evidências de qualidade e operação da solução, incluindo testes realizados, análise de código com IA, os sinais de observabilidade utilizados, pipeline, análise de logs, anomalia identificada e estimativa de tendência ou risco de falha;</li>
+<li><strong>Automação low-code/no-code:</strong> descrever o fluxo integrado à aplicação, indicando seu gatilho, sua relação com a solução principal e a saída produzida. Quando utilizado, também poderá ser apresentado ChatOps ou outro mecanismo de alerta ou notificação;</li>
+<li><strong>Cenários de uso:</strong> documentar dois cenários, sendo um fluxo principal e um cenário de risco, falha ou exceção, apresentando exemplos de entrada, comportamento esperado e resultado produzido;</li>
+<li><strong>Análise crítica e limitações:</strong> apresentar pelo menos um refinamento relevante realizado durante o desenvolvimento, indicando o problema observado, a alteração aplicada e o resultado obtido, além das principais limitações, possibilidades de evolução e link do vídeo de demonstração.</li>
+</ul>
+<h3 id="53-uso-do-quadro-do-github">5.3. Uso do quadro do GitHub</h3>
+<p>Crie um GitHub Project para organizar o desenvolvimento utilizando as colunas <strong>Backlog</strong>, <strong>A Fazer</strong>, <strong>Em Andamento</strong>, <strong>Bloqueado</strong>, <strong>Em Revisão</strong> e <strong>Concluído</strong>. Os cards deverão refletir o processo real, e não ser criados apenas ao final.</p>
+<p>Cada card deverá representar uma atividade real do projeto e conter uma descrição clara da tarefa, seu objetivo e o resultado esperado. Quando aplicável, o card poderá ser relacionado a branches, pull requests, testes ou outras evidências produzidas durante o desenvolvimento.</p>
+<p>Para apoiar a organização do trabalho, os temas abaixo podem ser utilizados como referência para a criação dos cards:</p>
+<ul>
+<li>definição do problema, escopo e arquitetura da solução;</li>
+<li>implementação do fluxo com LangGraph;</li>
+<li>desenvolvimento da tool e integração;</li>
+<li>implementação de memória, contexto ou RAG;</li>
+<li>segurança, governança e tratamento de entradas adversariais;</li>
+<li>implementação de logs e demais sinais de observabilidade;</li>
+<li>análise de código e criação ou refinamento de testes com IA;</li>
+<li>configuração do pipeline e análise de logs;</li>
+<li>detecção de anomalias e análise de tendência ou risco de falha;</li>
+<li>integração da automação low-code/no-code;</li>
+<li>documentação, README.md, vídeo e preparação da entrega.</li>
+</ul>
+<p>O quadro deve refletir de forma consistente o fluxo de desenvolvimento, garantindo coerência entre tarefas, commits, branches e artefatos gerados ao longo do ciclo de implementação.</p>
+<h3 id="54-uso-do-repositorio-no-github">5.4. Uso do repositório no GitHub</h3>
+<p>Utilize um repositório no GitHub para controle de versionamento, inclusive em sua conta pessoal. O histórico deverá permitir identificar claramente a evolução do projeto.</p>
+<ul>
+<li>Adicionar o professor como colaborador, conforme as orientações fornecidas para a avaliação.</li>
+<li>Utilizar as branches <code>main</code> e <code>develop</code> e criar feature branches a partir da <code>develop</code>.</li>
+<li>Relacionar branches, cards e pull requests sempre que possível.</li>
+<li>Criar commits naturalmente, de acordo com a evolução do projeto, utilizando mensagens semânticas, claras, objetivas e coerentes com cada avanço realizado.</li>
+<li>Manter o código final integrado na <code>main</code> e não alterar o repositório após o prazo.</li>
+<li>Não versionar chaves, tokens, senhas, arquivos <code>.env</code> ou dados sensíveis.</li>
+<li>Incluir <code>.env.example</code>, dependências, comandos de execução, testes e workflows.</li>
+<li>Organizar toda a documentação e as evidências do projeto no diretório <code>/docs</code>, utilizando subpastas quando necessário, como <code>/docs/prompts</code>, <code>/docs/qa</code> e <code>/docs/evidencias</code>.</li>
+</ul>
+<p><strong>Sugestão de branches:</strong> <code>feature/langgraph-agente</code>, <code>feature/tool-integracao</code>, <code>feature/memoria-rag</code>, <code>feature/governanca</code>, <code>feature/observabilidade</code>, <code>feature/qa-inteligente</code>, <code>feature/devops-anomalias</code>, <code>feature/low-code</code> e <code>docs/readme-video</code>.</p>
+<h3 id="55-gravacao-de-video">5.5. Gravação de vídeo</h3>
+<p>O estudante deverá gravar um vídeo com duração recomendada de até 10 minutos, admitindo-se o limite máximo de 12 minutos, publicá-lo no YouTube como não listado, inserir o link no <code>README.md</code> do repositório e submetê-lo no AVA junto com os demais links do projeto. O vídeo deverá priorizar os seguintes pontos:</p>
+<ul>
+<li>Problema, objetivo e classificação da solução;</li>
+<li>Visão resumida da arquitetura e das integrações;</li>
+<li>Dois cenários de uso, sendo um fluxo principal e um cenário de risco, falha, exceção ou comportamento anômalo;</li>
+<li>Evidência de segurança, bloqueio ou aprovação humana, quando aplicável;</li>
+<li>Uma evidência de QA;</li>
+<li>Pipeline, análise de logs, detecção de anomalias e estimativa de tendência ou risco de falha;</li>
+<li>Demonstração resumida da automação low-code/no-code;</li>
+<li>Principais limitações e melhorias futuras.</li>
+</ul>
+<p><strong>Sugestão de roteiro:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Intervalo</th>
+<th>Conteúdo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0:00 a 1:00</td>
+<td>Problema, objetivo e classificação da solução</td>
+</tr>
+<tr>
+<td>1:00 a 2:00</td>
+<td>Visão resumida da arquitetura e das integrações</td>
+</tr>
+<tr>
+<td>2:00 a 4:00</td>
+<td>Dois cenários de uso (fluxo principal + cenário de risco, falha, exceção ou comportamento anômalo)</td>
+</tr>
+<tr>
+<td>4:00 a 5:00</td>
+<td>Evidência de segurança, bloqueio ou aprovação humana, quando aplicável</td>
+</tr>
+<tr>
+<td>5:00 a 6:00</td>
+<td>Uma evidência de QA</td>
+</tr>
+<tr>
+<td>6:00 a 8:00</td>
+<td>Pipeline, análise de logs, detecção de anomalias e estimativa de tendência ou risco de falha</td>
+</tr>
+<tr>
+<td>8:00 a 9:00</td>
+<td>Demonstração resumida da automação low-code/no-code</td>
+</tr>
+<tr>
+<td>9:00 a 10:00</td>
+<td>Principais limitações e melhorias futuras</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-criterios-de-avaliacao">6. Critérios de Avaliação</h2>
+<p>A tabela abaixo apresenta os critérios que serão avaliados durante a correção do projeto. A nota possui variação de 0 (zero) a 10 (dez). As faixas de pontuação foram padronizadas em 0 e 1,00; 0 / 0,25 / 0,50; ou 0 / 0,25 / 0,75, conforme o peso de cada bloco.</p>
+<p>Serão desconsiderados e atribuídos nota 0 (zero) a projetos que apresentarem plágio de soluções encontradas na internet ou de outros colegas. Também poderão receber nota zero os projetos com credenciais expostas, artefatos inacessíveis ou código que o estudante não consiga explicar durante a demonstração.</p>
+<h3 id="61-apresentacao-do-projeto">6.1. Apresentação do Projeto</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>1,00</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>O estudante entregou o vídeo de demonstração no YouTube como não listado, com duração recomendada de até 10 minutos e limite máximo de 12 minutos, cobrindo os pontos descritos no item 5.5?</td>
+<td>O vídeo não foi entregue, está inacessível, ultrapassa 12 minutos ou não demonstra o funcionamento e as evidências técnicas solicitadas.</td>
+<td>O vídeo está acessível, respeita o limite máximo de 12 minutos e cobre de forma clara os pontos previstos no item 5.5.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-uso-adequado-do-quadro-do-github">6.2. Uso adequado do quadro do GitHub</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>O estudante organizou o escopo do projeto em cards no quadro do GitHub?</td>
+<td>O quadro não existe, está inacessível ou não possui cards relacionados ao projeto.</td>
+<td>Os cards existem, mas representam apenas parte do trabalho ou possuem descrições pouco claras sobre a atividade e o resultado esperado.</td>
+<td>Os cards representam de forma coerente as principais atividades do projeto e possuem descrições suficientes para compreender o que foi planejado e realizado.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>O estudante manteve o quadro atualizado durante o desenvolvimento?</td>
+<td>Os cards não foram movimentados ou foram organizados apenas ao final do projeto.</td>
+<td>A movimentação ocorreu de forma parcial ou irregular, sem representar claramente a evolução do trabalho.</td>
+<td>O andamento dos cards foi atualizado de forma coerente, permitindo acompanhar a evolução real do projeto durante o desenvolvimento.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="63-uso-adequado-do-github-e-readmemd">6.3. Uso adequado do GitHub e README.md</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,75</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>O estudante utilizou adequadamente branches, commits e o fluxo de versionamento do projeto?</td>
+<td>O repositório não existe, está inacessível ou concentra o desenvolvimento diretamente na main, sem histórico que permita compreender a evolução do projeto.</td>
+<td>O repositório utiliza branches, mas apresenta fluxo inconsistente, histórico concentrado em poucas alterações ou commits com mensagens genéricas e pouco representativas.</td>
+<td>O desenvolvimento utiliza de forma coerente develop, feature branches e main, com commits incrementais e mensagens semânticas, claras e relacionadas à evolução real do projeto.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>O README.md e a documentação permitem compreender, executar e avaliar a solução?</td>
+<td>O README.md está ausente ou não fornece informações suficientes para compreender e executar o projeto.</td>
+<td>O README.md existe, mas possui instruções incompletas, informações importantes ausentes ou documentação insuficiente para compreender plenamente a solução.</td>
+<td>O README.md apresenta de forma clara a solução, sua arquitetura, instruções de configuração e execução, principais decisões técnicas, cenários e evidências necessárias para compreender, reproduzir e avaliar o projeto.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="64-aplicacao-arquitetura-agentica-e-integracoes">6.4. Aplicação, arquitetura agêntica e integrações</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,75</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6</td>
+<td>A aplicação está funcional e demonstra adequadamente o problema e os cenários definidos?</td>
+<td>A aplicação não executa, depende exclusivamente de respostas fixas ou não permite compreender o problema que pretende resolver.</td>
+<td>A aplicação executa parcialmente ou demonstra apenas um dos cenários esperados, apresentando limitações relevantes no fluxo.</td>
+<td>A aplicação executa de ponta a ponta, possui problema e domínio claramente definidos, demonstra os dois cenários esperados e produz uma saída estruturada e adequada ao domínio.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>O fluxo foi modelado adequadamente com LangGraph?</td>
+<td>Não há LangGraph funcional ou o fluxo não possui state, nodes e edges compreensíveis.</td>
+<td>O grafo existe, mas possui estado confuso, nodes excessivamente acoplados ou controle de fluxo incompleto.</td>
+<td>O grafo possui state tipado, nodes claros, execução sequencial, ramificação condicional, paralelização simples, condição de parada e separação coerente entre decisões do modelo e regras determinísticas.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>A solução utiliza adequadamente uma tool integrada?</td>
+<td>Não há tool funcional ou integração demonstrável.</td>
+<td>A tool existe, mas apresenta integração, validação ou tratamento de falhas incompleto.</td>
+<td>A solução possui uma tool funcional integrada por MCP, API, serviço, backend ou webhook, com validação e tratamento de falhas.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>A solução utiliza uma estratégia de memória ou recuperação contextual adequada ao domínio?</td>
+<td>Não há estratégia de memória ou recuperação contextual, ou o contexto é inserido de forma fixa e descontrolada.</td>
+<td>Existe uma estratégia de contexto, memória ou recuperação, mas sua utilização é limitada, pouco documentada ou não demonstra claramente o uso de informações relevantes pela aplicação.</td>
+<td>A solução utiliza de forma coerente uma estratégia de memória ou recuperação contextual adequada ao domínio, como state, checkpointer, armazenamento persistente ou RAG, recuperando e utilizando informações relevantes conforme a necessidade da aplicação.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="65-seguranca-observabilidade-e-resiliencia">6.5. Segurança, observabilidade e resiliência</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,75</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td>A solução aplica controles adequados de segurança e limites de autonomia?</td>
+<td>Não há proteção adequada de segredos, validação das ações ou tratamento de entradas não confiáveis.</td>
+<td>Existem controles de segurança, mas estão incompletos ou o cenário adversarial não demonstra claramente o comportamento seguro da aplicação.</td>
+<td>A solução protege credenciais, valida ações e entradas e demonstra um cenário adversarial no qual ações não autorizadas são bloqueadas. Aprovação humana é utilizada quando aplicável ao domínio.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>A execução possui pelo menos dois sinais de observabilidade correlacionados e tratamento adequado de falhas?</td>
+<td>Não há sinais suficientes para investigar a execução e as falhas não são tratadas adequadamente.</td>
+<td>Há apenas um sinal, os sinais não possuem correlação suficiente ou o tratamento de falhas está incompleto.</td>
+<td>A solução produz e correlaciona pelo menos dois sinais de observabilidade, incluindo logs estruturados, e permite identificar decisões, erros e latência. Também trata falhas com timeout, retry ou fallback, quando necessário.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="66-qa-devops-inteligente-e-low-code">6.6. QA, DevOps Inteligente e Low-Code</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td>O estudante aplicou IA em code review e testes relevantes?</td>
+<td>Não há evidência relevante de uso de IA em revisão de código ou testes.</td>
+<td>Há code review ou testes gerados, mas com cobertura superficial, sem validação crítica ou priorização por risco.</td>
+<td>A IA é utilizada em code review de uma alteração real e na geração ou refinamento de testes relevantes, incluindo pelo menos um dos seguintes tipos: integração, aceitação ou E2E, com priorização por risco ou impacto.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>A solução contempla DevOps inteligente, detecção de anomalias e estimativa de tendência ou risco de falha?</td>
+<td>Não há pipeline funcional nem análise de logs, anomalias ou estimativa de risco de falha.</td>
+<td>Há pipeline e uma análise parcial, mas faltam etapas, sinais, evidências ou interpretação estruturada.</td>
+<td>O pipeline executa lint, testes e build ou validação equivalente; a IA explica logs de pelo menos duas etapas, detecta e explica uma anomalia e produz uma estimativa simples de tendência ou risco. O deploy é considerado apenas quando aplicável.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>O estudante integrou uma automação low-code ou no-code ao projeto?</td>
+<td>Não há fluxo low-code/no-code demonstrável.</td>
+<td>Existe um fluxo visual isolado, incompleto ou sem integração real com a aplicação.</td>
+<td>Há automação low-code ou no-code integrada à solução principal, com trigger, integração com a aplicação ou serviço, saída observável e instruções de reprodução.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="67-analise-critica-e-evidencias">6.7. Análise crítica e evidências</h3>
+<table>
+<thead>
+<tr>
+<th>Nº</th>
+<th>Critério de Avaliação</th>
+<th>0</th>
+<th>0,25</th>
+<th>0,50</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15</td>
+<td>O estudante documentou um refinamento relevante da solução e apresentou evidências do desenvolvimento?</td>
+<td>Não há análise crítica ou evidências de refinamento.</td>
+<td>Há menção a um problema ou alteração, mas sem mostrar claramente a decisão e o resultado.</td>
+<td>O estudante apresenta o problema ou comportamento observado, a alteração realizada, a justificativa, o resultado obtido e evidências relacionadas ao desenvolvimento.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TOTAL: 10,00 pontos</strong></p>
+<hr />
+<h2 id="7-checklist-final-de-entrega">7. Checklist Final de Entrega</h2>
+<p>Antes de submeter no AVA, confira:</p>
+<h3 id="repositorio-e-organizacao">Repositório e organização</h3>
+<ul>
+<li>Criei o repositório no GitHub, adicionei o professor como colaborador e confirmei que nenhum segredo ou arquivo <code>.env</code> foi versionado.</li>
+<li>Organizei e mantive atualizado o quadro Kanban durante o desenvolvimento.</li>
+<li>Utilizei o fluxo <code>develop → feature/* → develop → main</code>, com commits semânticos e coerentes com a evolução do projeto.</li>
+<li>Mantive na <code>main</code> a versão final e funcional da aplicação.</li>
+</ul>
+<h3 id="dominio-arquitetura-e-agente">Domínio, arquitetura e agente</h3>
+<ul>
+<li>Defini o problema, o domínio e demonstrei dois cenários de uso, incluindo um cenário de risco, falha, exceção ou anomalia.</li>
+<li>Implementei o fluxo principal com LangGraph, incluindo state, nodes, execução sequencial, ramificação condicional, paralelização e condição de parada.</li>
+<li>Implementei uma tool funcional integrada por MCP, API, serviço, backend ou webhook;</li>
+<li>Adotei uma estratégia de memória ou recuperação contextual adequada à aplicação.</li>
+</ul>
+<h3 id="seguranca-observabilidade-e-resiliencia">Segurança, observabilidade e resiliência</h3>
+<ul>
+<li>Apliquei controles de segurança, incluindo validação de payloads, parâmetros, schemas e permissões, limites de autonomia, aprovação humana quando necessária e um cenário adversarial de prompt injection ou entrada não confiável.</li>
+<li>Produzi e correlacionei pelo menos dois sinais de observabilidade, sendo logs estruturados e um segundo sinal entre trace, métrica ou auditoria, registrando informações como erros e latência.</li>
+<li>Tratei falhas nas integrações, utilizando timeout, retry limitado ou fallback quando necessário.</li>
+</ul>
+<h3 id="qa-devops-e-low-code">QA, DevOps e Low-Code</h3>
+<ul>
+<li>Realizei code review com apoio de IA e gerei ou refinei testes relevantes, incluindo pelo menos um dos seguintes tipos: integração, aceitação ou E2E, com priorização baseada em risco, impacto ou criticidade;</li>
+<li>Configurei pipeline com lint, testes e build ou equivalente e utilizei IA para analisar logs de pelo menos duas etapas, detectar uma anomalia e produzir uma estimativa simples de tendência ou risco de falha;</li>
+<li>Integrei uma automação low-code/no-code à solução principal, com trigger e saída observável.</li>
+</ul>
+<h3 id="readmemd-e-evidencias">README.md e evidências</h3>
+<ul>
+<li>O <code>README.md</code> permite compreender, configurar, executar e avaliar a solução, incluindo as principais instruções do agente e a configuração do modelo por variável de ambiente.</li>
+<li>Documentei pelo menos um ciclo de refinamento, apresentando o problema observado, a alteração realizada e o resultado obtido.</li>
+<li>Organizei as principais evidências de testes, observabilidade, QA, DevOps e low-code/no-code;</li>
+<li>Incluí no <code>README.md</code> o link do vídeo de demonstração.</li>
+</ul>
+<h3 id="video-e-submissao">Vídeo e submissão</h3>
+<ul>
+<li>Gravei o vídeo com duração recomendada de até 10 minutos, sem ultrapassar 12 minutos, e publiquei como não listado.</li>
+<li>Demonstrei os dois cenários e os principais artefatos técnicos, incluindo pipeline, análise de logs, anomalia, estimativa de tendência ou risco e fluxo low-code/no-code.</li>
+<li>Mantive no repositório e no quadro do GitHub as evidências necessárias para acompanhar e avaliar o desenvolvimento individual.</li>
+<li>Submeti no AVA os links do repositório, quadro e vídeo antes do prazo e não alterei o repositório após a entrega.</li>
+</ul></main></body></html>

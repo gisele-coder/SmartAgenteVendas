@@ -1,0 +1,111 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-2-langgraph | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-2-langgraph.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 2 — Núcleo LangGraph</p>
+<hr />
+<h1 id="fase-2-nucleo-langgraph">Fase 2 — Núcleo LangGraph</h1>
+<blockquote>
+<p>Objetivo: implementar o fluxo agêntico com state tipado, nodes com responsabilidades claras, paralelização, ramificação condicional, condição de parada e separação entre decisão do LLM e regras determinísticas (brief 4.2).</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li>
+<p><strong>Aprovação de continuidade:</strong></p>
+<blockquote>
+<p>"ok" — aprovação da execução da Parte 2 conforme plano (<code>docs/plano-execucao.md</code>), incluindo a instrução permanente de registrar os prompts de cada fase antes de prosseguir</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Instrução de documentação do processo (regra permanente da fase 0):</strong></p>
+<blockquote>
+<p>"Preciso que já salvando os prompts de cada fase desenvolvida para comprovação do trabalho antes de prosseguir."</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="arquitetura-implementada">Arquitetura implementada</h3>
+<ul>
+<li><code>app/graph/state.py</code>: <code>RecommendationState</code> (TypedDict) com <strong>reducers</strong> <code>Annotated[list, operator.add]</code> em <code>errors</code> e <code>audit_events</code> — necessário porque os nodes paralelos atualizam estado concorrentemente</li>
+<li><code>app/graph/builder.py</code>: grafo com 8 nodes; fan-out <code>security_check → [get_purchase_history, find_similar_products]</code> (retorna <strong>lista</strong> no router condicional = paralelização); fan-in implícito em <code>generate_recommendations</code>; <code>block_request</code> e <code>finalize_response</code> como saídas; <strong>DAG sem ciclos</strong> = condição de parada estrutural contra loops infinitos</li>
+<li><code>app/graph/nodes.py</code>: 8 nodes + <code>_audit()</code> (base do audit log) + <code>parse_recommendations</code> (extração/validação de JSON do LLM contra o catálogo) + <code>_build_profile</code> (frequência de compra, categorias favoritas)</li>
+<li><code>app/graph/prompts.py</code>: <code>SYSTEM_PROMPT</code> (identidade, objetivo, 6 regras, formato JSON) + <code>build_user_prompt</code> (histórico + coocorrência + catálogo)</li>
+<li>LLM injetável via <code>config["configurable"]["llm"]</code> → testes com FakeLLM sem custo nem rede</li>
+<li><code>docs/prompts/system.md</code>: prompt de sistema documentado (brief 4.10)</li>
+</ul>
+<h3 id="bugs-encontrados-e-corrigidos-evidencia-de-depuracao-real">Bugs encontrados e corrigidos (evidência de depuração real)</h3>
+<ol>
+<li><strong>Testes vacuos da Parte 1</strong>: asserts sobre listas vazias passavam sem testar nada → descoberto ao integrar o grafo; a coocorrência retornava <code>[]</code> para TODOS os clientes
+   - <strong>Causa</strong>: a lógica olhava apenas os pedidos do próprio cliente (onde todo item já é dele) — resultado sempre vazio
+   - <strong>Correção</strong> (<code>app/tools/similar.py</code>): market-basket real — produtos que aparecem em <strong>qualquer pedido da base</strong> que contenha algo do perfil do cliente, excluindo o que ele já comprou; <code>confidence = coocorrência / pedidos contendo produtos do perfil</code>
+   - Testes reforçados com asserts de não-vazio</li>
+<li><strong>Injeção de config no LangGraph</strong>: node com parâmetro <code>config: dict | None</code> não recebia a config (warning do LangGraph) → o node chamava a <strong>API real</strong> nos testes (36s) em vez do FakeLLM
+   - <strong>Correção</strong>: tipar como <code>RunnableConfig | None</code> (<code>langchain_core.runnables</code>)</li>
+<li><strong>Reasoning consumindo tokens</strong>: <code>hy3-free</code> gastou os 800 <code>max_tokens</code> só no raciocínio (<code>content: ""</code>) → <strong>Refinamento 1 documentado</strong> (<code>docs/prompts/refinamentos/refinamento-1-max-tokens.md</code>): <code>LLM_MAX_TOKENS=3000</code></li>
+</ol>
+<h3 id="validacao-end-to-end-real-modelo-hy3-free-sem-fallback">Validação end-to-end real (modelo hy3-free, sem fallback)</h3>
+<pre><code class="language-text">status: success | fallback_used: False | erros: []
+- 10014 SUPORTE CONDENSADORA 450MM (conf 0.53)
+- 10013 AR CONDICIONADO 9000 BTUS INVERTER (conf 0.31)
+- 10012 AR CONDICIONADO 12000 BTUS INVERTER (conf 0.22)
+</code></pre>
+<p>O agente reproduziu o padrão semântico proposital da base (climatização: ar-condicionado → suporte), justificando cada item pela coocorrência.</p>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Testes</td>
+<td><code>pytest</code> → <strong>17 passed</strong> (6 novos em <code>test_graph.py</code>: sucesso, catálogo, fallback, cliente inexistente, injection bloqueado, auditoria paralela) em ~6s (FakeLLM, sem rede)</td>
+</tr>
+<tr>
+<td>Lint</td>
+<td><code>ruff check .</code> → All checks passed</td>
+</tr>
+<tr>
+<td>E2E real</td>
+<td>1 chamada real ao <code>hy3-free</code> com recomendações coerentes (acima)</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/langgraph-core</code></td>
+</tr>
+<tr>
+<td>Refinamento</td>
+<td><code>docs/prompts/refinamentos/refinamento-1-max-tokens.md</code></td>
+</tr>
+</tbody>
+</table></main></body></html>

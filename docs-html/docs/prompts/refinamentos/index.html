@@ -1,0 +1,55 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>refinamentos | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/refinamentos/README.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="refinamentos-historico">Refinamentos — Histórico</h1>
+<blockquote>
+<p>Cada arquivo registra um ciclo completo: <strong>problema observado → alteração realizada → resultado obtido</strong>, conforme exigido pelo brief (seção 4.10 / critério 15).</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Data</th>
+<th>Resumo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="refinamento-1-max-tokens.html"><code>refinamento-1-max-tokens.md</code></a></td>
+<td>2026-08-29</td>
+<td>Modelo de reasoning consumia todo o <code>max_tokens</code> sem gerar JSON → folga de tokens + validação/fallback</td>
+</tr>
+<tr>
+<td><a href="refinamento-2-audit-correlacao.html"><code>refinamento-2-audit-correlacao.md</code></a></td>
+<td>2026-08-29</td>
+<td>Checkpointer acumulava <code>audit_events</code> entre execuções do thread → filtro por <code>request_id</code> no persistir</td>
+</tr>
+<tr>
+<td><a href="refinamento-3-chatflow-para-agentflow-v2.html"><code>refinamento-3-chatflow-para-agentflow-v2.md</code></a></td>
+<td>2026-08-31</td>
+<td>Custom JS Function de Chatflow v3.x rejeita Chat Model (erro de JSON ao conectar) → migração do fluxo para Agentflow V2 (<code>Start → LLM → Custom Function</code>); demo E2E real <code>3bfceacea49f</code> (Discord HTTP 204)</td>
+</tr>
+</tbody>
+</table></main></body></html>

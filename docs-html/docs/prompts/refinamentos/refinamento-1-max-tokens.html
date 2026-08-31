@@ -1,0 +1,60 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>refinamento-1-max-tokens | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/refinamentos/refinamento-1-max-tokens.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="refinamento-1-saida-vazia-do-modelo-de-reasoning">Refinamento 1 — Saída vazia do modelo de reasoning</h1>
+<p><strong>Data:</strong> 2026-08-29 · <strong>Fase:</strong> 2 (Núcleo LangGraph)</p>
+<h2 id="problema-observado">Problema Observado</h2>
+<p>Na primeira execução real do fluxo (cliente 100011), o node <code>generate_recommendations</code> sempre falhava no parsing: <code>resposta do LLM sem array JSON</code>, acionando o fallback determinístico (<code>fallback_used: True</code>).</p>
+<p>Inspeção da resposta crua do modelo (<code>hy3-free</code>):</p>
+<pre><code class="language-json">{
+  &quot;content&quot;: &quot;&quot;,
+  &quot;finish_reason&quot;: &quot;length&quot;,
+  &quot;token_usage&quot;: {
+    &quot;completion_tokens&quot;: 800,
+    &quot;reasoning_tokens&quot;: 800
+  }
+}
+</code></pre>
+<p>Diagnóstico: <code>hy3-free</code> é um modelo de <em>reasoning</em> — ele "pensa" antes de responder, e os <strong>800 tokens de <code>max_tokens</code> eram 100% consumidos pelo raciocínio interno</strong>, sem sobrar espaço para a resposta visível (o JSON).</p>
+<h2 id="alteracao-realizada">Alteração Realizada</h2>
+<ul>
+<li><code>LLM_MAX_TOKENS</code> aumentado de <strong>800 → 3000</strong> (<code>app/config.py</code>, <code>.env</code>, <code>.env.example</code>)</li>
+<li>A validação determinística + fallback (coocorrência) já existentes continuam como proteção: se o modelo falhar, o sistema degrada graciosamente em vez de quebrar</li>
+</ul>
+<h2 id="resultado-obtido">Resultado Obtido</h2>
+<p>Execução real após o ajuste (mesmo cliente, mesma consulta):</p>
+<pre><code class="language-text">status: success
+fallback_used: False
+erros: []
+- 10014 SUPORTE CONDENSADORA 450MM (conf 0.53)
+- 10013 AR CONDICIONADO 9000 BTUS INVERTER (conf 0.31)
+- 10012 AR CONDICIONADO 12000 BTUS INVERTER (conf 0.22)
+</code></pre>
+<p>O agente passou a gerar recomendações justificadas citando a coocorrência — e acertou o padrão semântico proposital da base (ar-condicionado → suporte → cabo → disjuntor). Latência observada: ~18s (modelo gratuito com reasoning — aceitável para o domínio).</p>
+<h2 id="evidencia">Evidência</h2>
+<ul>
+<li>Log de execução capturado no terminal (fase 2)</li>
+<li>Arquivos alterados: <code>app/config.py</code>, <code>.env.example</code></li>
+</ul></main></body></html>

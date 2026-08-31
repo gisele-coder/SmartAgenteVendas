@@ -1,0 +1,100 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>anomalia-tool-latency-2026-08-29 | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/evidencias/anomalias/anomalia-tool-latency-2026-08-29.md</span><span>· <a href="../../../index.html">início</a></span></nav><h1 id="anomalia-degradacao-linear-de-latencia-na-tool-29082026">Anomalia — Degradação linear de latência na tool — 29/08/2026</h1>
+<h2 id="sintoma">Sintoma</h2>
+<p>Série de 8 execuções (<code>anom-001</code> a <code>anom-008</code>) mostra latência do node <code>get_purchase_history</code> saltando do baseline (~2 ms) e crescendo <strong>linearmente ~300 ms por execução</strong> a partir da 5ª:</p>
+<table>
+<thead>
+<tr>
+<th>Execução</th>
+<th style="text-align: right;">Latência get_purchase_history</th>
+<th style="text-align: right;">Latência find_similar_products</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>anom-001</td>
+<td style="text-align: right;">2,2 ms</td>
+<td style="text-align: right;">7,3 ms</td>
+</tr>
+<tr>
+<td>anom-002</td>
+<td style="text-align: right;">2,1 ms</td>
+<td style="text-align: right;">7,2 ms</td>
+</tr>
+<tr>
+<td>anom-003</td>
+<td style="text-align: right;">2,0 ms</td>
+<td style="text-align: right;">6,9 ms</td>
+</tr>
+<tr>
+<td>anom-004</td>
+<td style="text-align: right;">2,7 ms</td>
+<td style="text-align: right;">10,0 ms</td>
+</tr>
+<tr>
+<td><strong>anom-005</strong></td>
+<td style="text-align: right;"><strong>302,9 ms</strong> ⚠</td>
+<td style="text-align: right;">307,4 ms</td>
+</tr>
+<tr>
+<td><strong>anom-006</strong></td>
+<td style="text-align: right;"><strong>603,0 ms</strong> ⚠</td>
+<td style="text-align: right;">607,0 ms</td>
+</tr>
+<tr>
+<td><strong>anom-007</strong></td>
+<td style="text-align: right;"><strong>903,3 ms</strong> ⚠</td>
+<td style="text-align: right;">907,1 ms</td>
+</tr>
+<tr>
+<td><strong>anom-008</strong></td>
+<td style="text-align: right;"><strong>1203,5 ms</strong> ⚠</td>
+<td style="text-align: right;">1207,3 ms</td>
+</tr>
+</tbody>
+</table>
+<p>Ambas as tools paralelas degradam <strong>juntas</strong> e na mesma proporção → o gargalo está na camada de acesso a dados comum a ambas (<code>load_orders</code>).</p>
+<h2 id="evidencia-bruta">Evidência bruta</h2>
+<ul>
+<li>Logs JSON: <code>logs/execution.log</code> (1 linha por node, correlacionados por <code>request_id</code>)</li>
+<li>Métricas: <code>/metrics</code> → <code>tool_ms_max: 2410.8</code> (soma das duas tools no pico), <code>tool_ms_avg: 760.2</code> puxado para cima pelas execuções degradadas</li>
+<li>Audit: eventos <code>history_retrieved</code> presentes em todas as execuções (a tool <strong>não falhou</strong> — só ficou lenta)</li>
+</ul>
+<h2 id="analise-da-ia">Análise da IA</h2>
+<ul>
+<li><strong>Detecção</strong>: primeira execução com latência &gt; 10× o baseline = <code>anom-005</code> (302,9 ms vs 2,7 ms) — violação imediata do limite 10×</li>
+<li><strong>Padrão</strong>: degradação <strong>linear determinística</strong> (+300,1 ms/execução), não aleatória → exclui flakiness de rede; indica causa sistemática e crescente</li>
+<li><strong>Correlação</strong>: ambos os nodes de tool degradam juntos; LLM e security_check permanecem &lt;1 ms → causa isolada na camada de dados</li>
+</ul>
+<h2 id="causa-provavel-real-simulada-e-declarada">Causa provável (real: simulada e declarada)</h2>
+<p>Nesta série a causa foi <strong>injeção controlada</strong> via <code>settings.tool_delay_ms</code> (0 → 300 → 600 → 900 → 1200 ms), simulando degradação progressiva do ERP/aramazenamento. <strong>Em produção, este padrão indicaria</strong>: disco em saturação, lock de leitura concorrente no Excel ou degradação do WebService do ERP — a substituição do xlsx pelo ERP real herdaria este monitoramento sem mudar o agente.</p>
+<h2 id="acao-corretiva">Ação corretiva</h2>
+<ol>
+<li>Alerta automático no N8N quando <code>tool_ms</code> de uma execução &gt; 10× baseline (Parte 8 conecta este sinal)</li>
+<li>Recomendações: timeout na camada de acesso a dados quando migrada para ERP real + cache com TTL (o <code>lru_cache</code> atual já mitiga repetições no mesmo processo)</li>
+<li>Risco estimado documentado em <a href="../metricas/tendencia-risco-2026-08-29.html"><code>../metricas/tendencia-risco-2026-08-29.md</code></a></li>
+</ol></main></body></html>

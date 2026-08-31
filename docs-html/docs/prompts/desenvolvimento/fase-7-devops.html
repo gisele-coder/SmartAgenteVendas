@@ -1,0 +1,101 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>fase-7-devops | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/prompts/desenvolvimento/fase-7-devops.md</span><span>· <a href="../../../index.html">início</a></span></nav><hr />
+<p>origem: sessão de desenvolvimento assistido (opencode)
+status: oficial
+data: 2026-08-29
+fase: 7 — DevOps Inteligente</p>
+<hr />
+<h1 id="fase-7-devops-inteligente">Fase 7 — DevOps Inteligente</h1>
+<blockquote>
+<p>Objetivo: pipeline com lint/testes/build, IA analisando logs de ≥2 etapas, detecção de anomalia e estimativa de tendência/risco (brief 4.8).</p>
+</blockquote>
+<hr />
+<h2 id="prompts-utilizados">Prompts utilizados</h2>
+<ol>
+<li>
+<p><strong>Instrução de processo (usuário, repetida antes desta fase):</strong></p>
+<blockquote>
+<p>"De o commit antes e atualize os prompts e documentação antes de continuar"
+   (aplicada: varredura documental + commit <code>24d6fa0</code> antes de iniciar)</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Aprovação de continuidade</strong> para a Parte 7 conforme plano</p>
+</li>
+</ol>
+<hr />
+<h2 id="resultado-da-interacao">Resultado da interação</h2>
+<h3 id="pipeline-githubworkflowsciyml">Pipeline (<code>.github/workflows/ci.yml</code>)</h3>
+<ul>
+<li>Gatilhos: push (todas as branches) + pull_request → develop/main</li>
+<li>Estágios: <strong>Install → Lint (ruff) → Tests (pytest + cobertura) → Build (wheel)</strong> + upload de artefato</li>
+<li><code>LLM_API_KEY</code> chega via <strong>GitHub Secret</strong> (nunca versionada); sem a secret, o smoke test do LLM pula automaticamente</li>
+<li>Pipeline executado <strong>localmente</strong> com os mesmos estágios para captura dos logs — <strong>3/3 verdes</strong> (lint limpo, 42 testes, wheel 3,5 KB)</li>
+</ul>
+<h3 id="ia-analisando-logs-de-2-etapas-criterio-13">IA analisando logs de ≥2 etapas (critério 13)</h3>
+<p>Análise documentada em <a href="../../evidencias/pipeline/pipeline-local-2026-08-29.html"><code>evidencias/pipeline/pipeline-local-2026-08-29.md</code></a>, cobrindo os 3 estágios: estabilidade do lint, ausência de flakiness nos testes (duração estável 5,8–7 s, sem rede), validação de empacotamento pelo build. Pontos de atenção registrados (Python 3.12 CI vs 3.14 local; secret necessária no CI).</p>
+<h3 id="deteccao-e-explicacao-de-anomalia-criterio-13">Detecção e explicação de anomalia (critério 13)</h3>
+<ul>
+<li>Série real de 8 execuções (<code>anom-001</code>–<code>anom-008</code>) com degradação progressiva da tool (injeção controlada via <code>tool_delay_ms</code>)</li>
+<li><strong>Anomalia detectada na run 5</strong> (302,9 ms vs baseline 2,7 ms — violação do limite 10×); padrão linear +300 ms/run; ambas as tools degradam juntas → causa isolada na camada de dados</li>
+<li>Documentada em <a href="../../evidencias/anomalias/anomalia-tool-latency-2026-08-29.html"><code>evidencias/anomalias/anomalia-tool-latency-2026-08-29.md</code></a></li>
+</ul>
+<h3 id="estimativa-de-tendenciarisco-criterio-13">Estimativa de tendência/risco (critério 13)</h3>
+<ul>
+<li>Regressão linear sobre a série real: <strong>+178,8 ms/execução (global)</strong> e <strong>+300,2 ms/execução (pós-início, conservador)</strong></li>
+<li><strong>Risco ALTO</strong>: SLA de 2 s violado em ~3 execuções se a tendência continuar (projeto run a run na tabela)</li>
+<li>Pressupostos declarados (série simulada; forma da curva em produção depende da causa raiz)</li>
+<li>Documentado em <a href="../../evidencias/metricas/tendencia-risco-2026-08-29.html"><code>evidencias/metricas/tendencia-risco-2026-08-29.md</code></a></li>
+</ul>
+<hr />
+<h2 id="evidencias">Evidências</h2>
+<table>
+<thead>
+<tr>
+<th>Evidência</th>
+<th>Detalhe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pipeline</td>
+<td>3/3 etapas verdes (local) + workflow real disparado no push</td>
+</tr>
+<tr>
+<td>Anomalia</td>
+<td>Série 8 runs, detecção na run 5, causa isolada, ações corretivas</td>
+</tr>
+<tr>
+<td>Tendência/risco</td>
+<td>Regressão + projeção run a run + 3 ações preventivas</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td><code>feature/devops-anomalias</code></td>
+</tr>
+</tbody>
+</table></main></body></html>

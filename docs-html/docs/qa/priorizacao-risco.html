@@ -1,0 +1,135 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>priorizacao-risco | SmartOrder AI</title><style>
+:root { color-scheme: light dark; --bg:#0d1117; --fg:#e6edf3; --muted:#8b949e;
+  --accent:#58a6ff; --border:#30363d; --code:#161b22; --surface:#161b22; }
+@media (prefers-color-scheme: light) { :root { --bg:#fff; --fg:#1f2328; --muted:#59636e;
+  --accent:#0969da; --border:#d0d7de; --code:#f6f8fa; --surface:#f6f8fa; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 -apple-system,
+  BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.container { max-width:980px; margin:auto; padding:28px 24px 72px; }
+.toolbar { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:10px 0; border-bottom:1px solid var(--border);
+  background:var(--bg); color:var(--muted); font-size:13px; }
+.dot { width:10px; height:10px; border-radius:50%; background:#3fb950; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1,h2,h3,h4 { line-height:1.25; margin:28px 0 16px; }
+h1,h2 { border-bottom:1px solid var(--border); padding-bottom:.3em; }
+blockquote { margin:0; padding:0 1em; color:var(--muted); border-left:.25em solid var(--border); }
+code { padding:.2em .4em; border-radius:6px; background:var(--code); font-size:85%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+pre { overflow:auto; padding:16px; border-radius:8px; background:var(--code); font-size:85%; }
+pre code { padding:0; background:transparent; }
+table { width:100%; border-collapse:collapse; margin:16px 0; }
+th,td { padding:7px 13px; border:1px solid var(--border); text-align:left; }
+th,tr:nth-child(even) { background:var(--surface); }
+img { max-width:100%; height:auto; } .index li { margin:6px 0; }
+</style></head><body><main class="container"><nav class="toolbar"><span class="dot"></span><span>docs/qa/priorizacao-risco.md</span><span>· <a href="../../index.html">início</a></span></nav><hr />
+<p>origem: análise de risco do projeto (IA + critério 12 do brief)
+status: oficial
+data: 2026-08-29
+finalidade: justificar testes/cenários priorizados por risco, impacto ou criticidade
+relacionado: <a href="index.html">./README.md</a> | <a href="relatorios/relatorio-cobertura-2026-08-29.html">./relatorios/relatorio-cobertura-2026-08-29.md</a></p>
+<hr />
+<h1 id="priorizacao-de-testes-por-risco">Priorização de Testes por Risco</h1>
+<blockquote>
+<p>Critério 12 do brief: "selecionar e justificar pelo menos um teste ou cenário considerado prioritário com base em risco, impacto ou criticidade".</p>
+</blockquote>
+<h2 id="matriz-de-priorizacao">Matriz de priorização</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Cenário de teste</th>
+<th>Impacto</th>
+<th>Probabilidade de falha</th>
+<th>Risco</th>
+<th>Prioridade</th>
+<th>Teste(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Acesso indevido a dados de outros clientes</strong> (prompt injection pedindo histórico de todos)</td>
+<td><strong>Alto</strong> — violação de privacidade/LGPD, nota zero no critério 10 se falhar</td>
+<td>Média — modelos de LLM são suscetíveis a injection</td>
+<td><strong>Alto</strong></td>
+<td><strong>1</strong></td>
+<td><code>test_injection_bloqueado_nao_chama_llm</code>, <code>test_prompt_injection_bloqueado_via_api</code>, <code>test_injection_detectada</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>LLM responde fora do contrato</strong> (sem JSON / produto inventado)</td>
+<td>Alto — quebra a saída estruturada e a confiança no catálogo</td>
+<td><strong>Alta</strong> — observado 3× em execução real com modelo gratuito de reasoning</td>
+<td><strong>Alto</strong></td>
+<td><strong>2</strong></td>
+<td><code>test_fallback_deterministico_quando_llm_falha</code>, <code>test_recomendacoes_pertencem_ao_catalogo</code>, <code>test_fallback_via_api</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Correlação de auditoria corrompida</strong> (eventos com <code>request_id</code> errado)</td>
+<td>Alto — impossibilita investigação de execuções (crit. 11)</td>
+<td>Média — já ocorreu de fato (Refinamento 2)</td>
+<td>Alto</td>
+<td>3</td>
+<td><code>test_audit_persistido_em_arquivo</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Falha de invocação invisível nas métricas</strong></td>
+<td>Médio — anomalias de taxa de erro ficam ocultas (crit. 13)</td>
+<td>Média — identificada no code review A1</td>
+<td>Médio</td>
+<td>4</td>
+<td><code>test_metricas_registram_falha_de_invocacao</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Cliente inexistente / payload inválido</td>
+<td>Baixo — degradação controlada</td>
+<td>Alta</td>
+<td>Baixo</td>
+<td>5</td>
+<td><code>test_cliente_inexistente_*</code>, <code>test_payload_invalido_422</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Memória entre execuções (checkpointer)</td>
+<td>Médio — função demonstrável no vídeo</td>
+<td>Baixa</td>
+<td>Baixo</td>
+<td>6</td>
+<td><code>test_memoria_recomendacoes_anteriores_no_mesmo_thread</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="justificativa-da-prioridade-1">Justificativa da prioridade 1</h2>
+<p>O cenário "acesso indevido a dados de outros clientes" combina <strong>impacto máximo</strong> (privacidade + requisito explícito do brief: "informações sensíveis não são reveladas") com a <strong>naturza do problema</strong> (a consulta do usuário é entrada não confiável por definição). O comportamento seguro exigido: bloqueio no node <code>security_check</code> <strong>antes</strong> de qualquer tool ou chamada ao LLM — o que é asserção literal dos testes (<code>llm.calls == 0</code>). Este cenário também é o <strong>cenário adversarial</strong> demonstrado no vídeo e arquivado em <a href="../evidencias/seguranca/adversarial-fase-4.html"><code>evidencias/seguranca/adversarial-fase-4.md</code></a>.</p>
+<h2 id="tipos-de-teste-presentes-criterio-12">Tipos de teste presentes (critério 12)</h2>
+<table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Onde</th>
+<th>Escopo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unitários</strong></td>
+<td><code>test_tools.py</code>, <code>test_security.py</code></td>
+<td>Validação de entrada, patterns, coocorrência, audit</td>
+</tr>
+<tr>
+<td><strong>Integração</strong></td>
+<td><code>test_api.py</code>, <code>test_observability.py</code></td>
+<td>HTTP (TestClient) → LangGraph → tools → base xlsx → contrato Pydantic</td>
+</tr>
+<tr>
+<td><strong>E2E (fluxo completo)</strong></td>
+<td><code>test_recomendacao_sucesso_integracao</code>, evidências reais com uvicorn + LLM</td>
+<td>Ponta a ponta com modelo real (<code>hy3-free</code>) — <a href="../evidencias/index.html"><code>evidencias/execucoes/</code></a></td>
+</tr>
+</tbody>
+</table></main></body></html>
