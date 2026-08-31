@@ -40,8 +40,8 @@ Esta pasta já está populada:
 
 - [`system.md`](./system.md) — prompt de sistema principal (definido na Parte 2)
 - [`outros-prompts.md`](./outros-prompts.md) — prompt de usuário e prompts auxiliares
-- [`desenvolvimento/`](./desenvolvimento/README.md) — prompts das fases 0-7 com evidências
-- [`refinamentos/`](./refinamentos/README.md) — 2 ciclos de refinamento documentados (critério 15)
+- [`desenvolvimento/`](./desenvolvimento/README.md) — prompts das fases 0-8 com evidências
+- [`refinamentos/`](./refinamentos/README.md) — 3 ciclos de refinamento documentados (critério 15)
 
 > Lembrete: o modelo (LLM) deve ser configurado por **variável de ambiente**, nunca hardcoded no repositório (seção 4.10 do brief).
 
