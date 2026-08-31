@@ -46,6 +46,7 @@ def recommend(
                 "request_id": request_id,
                 "customer_id": request.customer_id,
                 "query": request.query,
+                "seed_products": request.seed_products,
             },
             llm=llm,
         )

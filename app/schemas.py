@@ -8,6 +8,15 @@ class RecommendationRequest(BaseModel):
         max_length=500,
         description="Solicitação opcional em linguagem natural",
     )
+    seed_products: list[int] = Field(
+        default_factory=list,
+        max_length=10,
+        description=(
+            "Códigos de produtos pesquisados ou no carrinho (opcional, máx. 10). "
+            "Códigos fora do catálogo são filtrados com aviso em errors; "
+            "se todos forem inválidos, status=error."
+        ),
+    )
 
 
 class Recommendation(BaseModel):

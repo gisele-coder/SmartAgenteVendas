@@ -29,7 +29,7 @@ def validate_input(state: dict) -> dict:
         {"cod_prod": rec["cod_prod"], "product": rec["product"]}
         for rec in state.get("recommendations", [])[:5]
     ]
-    errors = list(state.get("errors", []))
+    errors: list[str] = []
     if not isinstance(customer_id, int) or isinstance(customer_id, bool) or customer_id <= 0:
         errors.append("customer_id inválido")
         log_flow(request_id, "validate_input", _lat(t0), validated=False, reason="id inválido")
@@ -38,11 +38,47 @@ def validate_input(state: dict) -> dict:
         errors.append(f"cliente {customer_id} inexistente")
         log_flow(request_id, "validate_input", _lat(t0), validated=False, reason="inexistente")
         return {"validated": False, "errors": errors}
-    log_flow(request_id, "validate_input", _lat(t0), validated=True, has_memory=bool(previous))
+
+    raw_seeds = state.get("seed_products") or []
+    valid_seeds: list[int] = []
+    catalog = get_catalog()
+    for cod in raw_seeds:
+        if not isinstance(cod, int) or isinstance(cod, bool):
+            errors.append(f"código de produto inválido: {cod!r}")
+            continue
+        if cod not in catalog:
+            errors.append(f"produto {cod} fora do catálogo (filtrado)")
+            continue
+        if cod not in valid_seeds:
+            valid_seeds.append(cod)
+
+    if raw_seeds and not valid_seeds:
+        log_flow(
+            request_id,
+            "validate_input",
+            _lat(t0),
+            validated=False,
+            reason="nenhum seed válido",
+        )
+        return {
+            "validated": False,
+            "errors": errors + ["nenhum produto válido em seed_products"],
+            "seed_products": [],
+        }
+
+    log_flow(
+        request_id,
+        "validate_input",
+        _lat(t0),
+        validated=True,
+        has_memory=bool(previous),
+        seed_count=len(valid_seeds),
+    )
     return {
         "validated": True,
-        "errors": [],
+        "errors": errors,
         "previous_recommendations": previous,
+        "seed_products": valid_seeds,
         "audit_events": [
             _audit(state, "input_validated", customer_id=customer_id, has_memory=bool(previous))
         ],
@@ -94,13 +130,20 @@ def get_purchase_history(state: dict) -> dict:
 
 def find_similar_products_node(state: dict) -> dict:
     t0 = time.perf_counter()
-    result = find_similar_products(state["customer_id"], limit=5)
+    seeds = state.get("seed_products") or []
+    result = find_similar_products(state["customer_id"], limit=5, seed_products=seeds)
     latency = _lat(t0)
-    log_flow(state.get("request_id", "n/a"), "find_similar_products", latency, count=len(result))
+    log_flow(
+        state.get("request_id", "n/a"),
+        "find_similar_products",
+        latency,
+        count=len(result),
+        seed=bool(seeds),
+    )
     return {
         "similar_products": [item.model_dump() for item in result],
         "similar_ms": latency,
-        "audit_events": [_audit(state, "similar_retrieved", count=len(result))],
+        "audit_events": [_audit(state, "similar_retrieved", count=len(result), seed=bool(seeds))],
     }
 
 
@@ -140,7 +183,9 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
 
     catalog = get_catalog()
     similar = state.get("similar_products", [])
-    prompt = build_user_prompt(state["customer_id"], history, similar, catalog)
+    seeds = state.get("seed_products") or []
+    prior_errors = list(state.get("errors", []))
+    prompt = build_user_prompt(state["customer_id"], history, similar, catalog, seed_products=seeds)
     try:
         response = llm.invoke([("system", SYSTEM_PROMPT), ("human", prompt)])
         parsed = parse_recommendations(response.content, catalog)
@@ -148,7 +193,7 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
         return {
             "llm_recommendations": parsed,
             "fallback_used": False,
-            "errors": [],
+            "errors": prior_errors,
             "audit_events": [
                 _audit(state, "recommendation_generated", count=len(parsed), source="llm")
             ],
@@ -164,7 +209,7 @@ def generate_recommendations(state: dict, config: RunnableConfig | None = None) 
         return {
             "llm_recommendations": [],
             "fallback_used": True,
-            "errors": [f"geração por LLM falhou: {exc}"],
+            "errors": prior_errors + [f"geração por LLM falhou: {exc}"],
             "audit_events": [_audit(state, "llm_failed", error=str(exc)[:120])],
         }
 

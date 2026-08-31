@@ -6,6 +6,7 @@ class RecommendationState(TypedDict, total=False):
     request_id: str
     customer_id: int
     query: str
+    seed_products: list[int]
     validated: bool
     security_status: str
     block_reason: str

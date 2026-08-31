@@ -17,7 +17,13 @@ Responda SOMENTE com um array JSON válido, sem texto antes ou depois:
 Recomende de 3 a 5 itens, ordenados do mais para o menos relevante."""
 
 
-def build_user_prompt(customer_id: int, history: list[dict], similar: list[dict], catalog: dict) -> str:
+def build_user_prompt(
+    customer_id: int,
+    history: list[dict],
+    similar: list[dict],
+    catalog: dict,
+    seed_products: list[int] | None = None,
+) -> str:
     history_lines = "\n".join(
         f"- {item['produto']} (cod {item['cod_prod']}) | setor {item['setor']} | categoria {item['categoria']}"
         for item in history[:40]
@@ -33,8 +39,21 @@ def build_user_prompt(customer_id: int, history: list[dict], similar: list[dict]
         f"- cod {cod}: {info['produto']} | setor {info['setor']} | categoria {info['categoria']}"
         for cod, info in sorted(catalog.items())
     )
+    if seed_products:
+        cart_lines = "\n".join(
+            f"- cod {cod}: {catalog.get(cod, {}).get('produto', '?')} "
+            f"| setor {catalog.get(cod, {}).get('setor', '?')} "
+            f"| categoria {catalog.get(cod, {}).get('categoria', '?')}"
+            for cod in seed_products
+        )
+        cart_section = (
+            f"PRODUTOS NO CARRINHO (base da recomendação — pesquise complementares destes itens):\n{cart_lines}\n\n"
+        )
+    else:
+        cart_section = ""
     return (
         f"CLIENTE {customer_id}\n\n"
+        f"{cart_section}"
         f"HISTÓRICO DE COMPRA:\n{history_lines}\n\n"
         f"COOCORRÊNCIA CALCULADA (comprados junto com o histórico deste cliente):\n{similar_lines}\n\n"
         f"CATÁLOGO DISPONÍVEL:\n{catalog_lines}\n\n"

@@ -121,6 +121,29 @@
 
 ---
 
+## [0.8.1] — 31/08 — Recomendação por carrinho/produto semente (Parte 9, extra)
+
+### Adicionado
+- **API**: campo opcional `seed_products: list[int]` em `RecommendationRequest` (máx. 10) — códigos de produtos pesquisados ou no carrinho
+- **Tool** `find_similar_products(..., seed_products=None)`: com sementes, a coocorrência market-basket passa a usar como base os pedidos que contêm os produtos do carrinho (excluindo os próprios sementes); sem sementes → comportamento atual intacto (zero regressão)
+- **State**: `seed_products: list[int]` (state tipado)
+- **Grafo**:
+  - `validate_input`: filtra códigos fora do catálogo (aviso em `errors`); todos inválidos → `status: error`
+  - `find_similar_products_node`: repassa `seed_products` à tool
+  - `generate_recommendations` + `build_user_prompt`: seção "PRODUTOS NO CARRINHO" injetada quando há sementes
+- **Teste visual sem dependência extra**: `http://localhost:8000/docs` (Swagger UI do FastAPI) — `Try it out` em `POST /recomendacoes` aceita `seed_products` e mostra o JSON
+- **Classe de testes** `tests/test_carrinho.py` (11 testes): tool (coocorrência do carrinho + semente inválida + compat sem sementes), grafo (prompt contém seção + fallback usa carrinho + códigos inválidos filtrados + todos inválidos = error), API (sucesso + backward-compat + 422 para >10 + injection ainda bloqueada)
+
+### Bugs corrigidos durante a feature
+- **Erros sobrescritos entre nodes**: `generate_recommendations` zerava `errors` no caminho de sucesso → avisos do filtro de sementes eram apagados. Fix: ler `state["errors"]` no início e preservar
+- **Erros vazando entre chamadas no mesmo thread** (MemorySaver): `validate_input` herdava `errors` do checkpoint anterior. Fix: `validate_input` agora começa com `errors = []` para cada nova execução
+
+### Métricas
+- Ruff limpo · **57 testes passados** (46 anteriores + 11 novos) · 1 falha pré-existente em `test_llm_smoke` (gateway não suporta mais `hy3-free`)
+- 100 % backward-compatible: requisições sem `seed_products` seguem idênticas
+
+---
+
 ## 🧭 Decisões registradas
 
 | Decisão | Motivo |
@@ -132,3 +155,4 @@
 | Memória: MemorySaver + histórico via tool | Adequado ao domínio (base pequena, consulta por cliente); RAG vetorial desnecessário agora |
 | Fallback determinístico (coocorrência) | Modelo gratuito com reasoning falha em ~1/3 das vezes — robustez + critério 15 |
 | Prompts por fase versionados | Comprovação do desenvolvimento assistido por IA (critérios 12/15) |
+| Recomendação por `seed_products` (carrinho) | Caso de uso "você também pode precisar" no carrinho de compras (não previsto no brief original, adicionado na Parte 9 como feature extra); backward-compatible (default = comportamento histórico) |
