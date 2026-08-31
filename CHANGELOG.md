@@ -9,9 +9,9 @@
 
 1. **PARTE 8 (fechar):**
    - a. Discord webhook (2 min) → [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md) passo 1
-   - b. Chatflow no Flowise Cloud (10 min) → passos 2.1–2.6 do mesmo doc
-   - c. Exportar o chatflow como `docs/lowcode/flowise-flow.json`
-   - d. Passar para o assistente: `FLOWISE_URL`, `FLOWISE_API_KEY`, `FLOWISE_CHATFLOW_ID` → `.env` + **demo end-to-end real** (injection → Discord) → evidência arquivada
+   - b. Agentflow V2 no Flowise Cloud (10 min) → passos 2.1–2.9 do mesmo doc
+   - c. Exportar o agentflow como `docs/lowcode/flowise-flow.json`
+   - d. Passar para o assistente: `FLOWISE_URL`, `FLOWISE_API_KEY`, `FLOWISE_CHATFLOW_ID` (= ID do agentflow) → `.env` + **demo end-to-end real** (injection → Discord) → evidência arquivada
    - e. `fase-8-lowcode.md` + Parte 8 ✅ no plano-execucao + critério 14 + Kanban
 2. **PARTE 9 (finalização, entregar até 15h):**
    - a. Prompts consolidados + refinamento (critério 15)
@@ -27,6 +27,8 @@
 - ✅ **Parte 8 (app-side) mergeada** — `0dc052c` · **47 passed** · Ruff limpo
 - ✅ Integração Flowise pronta e testada (best-effort, env-gated, não quebra a API)
 - ⏸️ **BLOQUEIO — aguardando ação do usuário** (fluxo visual no Flowise + Discord, roteiro pronto em [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md))
+- 🆕 **30/08**: Flowise Cloud não tem integração OpenCode → chatflow com **OpenRouter** (modelo free); passo 2 do doc atualizado
+- 🆕 **31/08**: Custom JS Function de chatflow não aceita Chat Model (erro de JSON ao conectar) → fluxo reconstruído como **Agentflow V2** (Start → LLM → Custom Function); passo 2 do doc reescrito com roteiro detalhado
 
 ---
 
@@ -38,12 +40,14 @@
 - 5 testes novos com HTTP mockado (habilitado/desabilitado/erro engolido/payload correto)
 - Passo a passo completo de reprodução: `docs/lowcode/reproducao-flowise.md`
 - Decisão registrada: N8N trial expirou → **Flowise** (aprovação do professor; melhor fit com "construção visual de agentes")
+- Decisão 30/08: Flowise Cloud não possui integração OpenCode → credencial/node **ChatOpenRouter** (modelo free via OpenRouter); `reproducao-flowise.md` passo 2 atualizado
+- Decisão 31/08: chatflow → **Agentflow V2** (o Custom JS Function de chatflow não aceita Chat Model; o V2 é o editor visual de agentes do Flowise, mesma Prediction API); passo 2 reescrito
 
 ### Falta para concluir a Parte 8 (ação do usuário)
-- [ ] Criar webhook do Discord (servidor → canal → Integrações → Webhooks)
-- [ ] Montar o Chatflow no Flowise Cloud (ChatOpenAI Custom `hy3-free` + prompt SRE + Custom Function → Discord) — roteiro exato no doc
-- [ ] Exportar o chatflow como `docs/lowcode/flowise-flow.json` (versionar)
-- [ ] Passar URL/API key/Chatflow ID → configurar `.env` local
+- [ ] Criar webhook do Discord ✅ (30/08)
+- [ ] Montar o **Agentflow V2** no Flowise Cloud (Start → LLM ChatOpenRouter modelo free + prompt SRE → Custom Function → Discord) — roteiro exato no doc
+- [ ] Exportar o agentflow como `docs/lowcode/flowise-flow.json` (versionar)
+- [ ] Passar URL/API key/Agentflow ID → configurar `.env` local
 - [ ] Evidência end-to-end real (injection → alerta no Discord) arquivada em `docs/evidencias/`
 - [ ] `fase-8-lowcode.md` + Parte 8 ✅ no plano-execucao + critério 14 marcado
 
@@ -132,6 +136,7 @@
 |---|---|
 | LLM `hy3-free` (gateway OpenCode) | Conta sem saldo para modelos pagos; gratuito e funcional (troca por env a qualquer momento) |
 | Flowise no lugar do N8N | Trial N8N expirou; professor aprovou; melhor fit com "construção visual de agentes" (critério 14) |
+| Agentflow V2 via OpenRouter | Flowise Cloud sem integração com o gateway OpenCode → modelo free equivalente via OpenRouter; Custom JS Function de chatflow não aceita Chat Model → Agentflow V2 (editor visual de agentes, mesma Prediction API; a app segue no `hy3-free`) |
 | Atividade individual | Definido pelo brief (Planejamento.md corrigido) |
 | Memória: MemorySaver + histórico via tool | Adequado ao domínio (base pequena, consulta por cliente); RAG vetorial desnecessário agora |
 | Fallback determinístico (coocorrência) | Modelo gratuito com reasoning falha em ~1/3 das vezes — robustez + critério 15 |

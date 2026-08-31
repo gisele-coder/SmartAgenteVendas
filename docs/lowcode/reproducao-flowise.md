@@ -17,12 +17,12 @@ POST /recomendacoes (com query adversarial ou fallback do LLM)
         │  app bloqueia/detecta falha
         ▼
 app/integrations/flowise.py  ──HTTP POST──►  Flowise Prediction API
-                                             (Chatflow: ChatPrompt → ChatOpenAI Custom
-                                              hy3-free → Custom Function)
-                                                    │  fetch()
-                                                    ▼
-                                              Discord webhook (alerta observável)
-                                             resposta volta e é logada pela app
+                                             (Agentflow V2: Start → LLM
+                                              ChatOpenRouter free → Custom Function)
+                                                     │  fetch()
+                                                     ▼
+                                               Discord webhook (alerta observável)
+                                              resposta volta e é logada pela app
 ```
 
 ## Passo 1 — Webhook do Discord (~2 min)
@@ -31,12 +31,18 @@ app/integrations/flowise.py  ──HTTP POST──►  Flowise Prediction API
 2. Configurações do canal → **Integrações** → **Webhooks** → **Novo Webhook** → copiar URL
    (formato `https://discord.com/api/webhooks/...`)
 
-## Passo 2 — Chatflow no Flowise Cloud (~10 min)
+## Passo 2 — Agentflow V2 no Flowise Cloud (~10 min)
 
-1. Conta em [flowiseai.com](https://flowiseai.com) (free tier) → **Dashboards → Chatflows → Add New**
-2. **Credencial** (canto superior, "Credentials"): *ChatOpenAI Custom* → nome `OpenCode`, API Key = sua chave OpenCode (fica no cofre do Flowise, não no repositório)
-3. Adicione o node **ChatOpenAI Custom**: Connect Credential = `OpenCode`, BaseURL = `https://opencode.ai/zen/v1`, Model Name = `hy3-free`, Temperature = `0.2`
-4. Adicione **ChatPrompt Template** (System Message):
+> **Por que Agentflow V2 (e não Chatflow)**: no Flowise atual, o node *Custom JS Function* de Chatflow não aceita conexão de um Chat Model — sua única entrada é o anchor "Input Variables", tipado como JSON, e a conexão `ChatOpenRouter → Custom Function` falha com erro de JSON. O **Agentflow V2** é o editor visual de agentes do Flowise e encadeia `Start → LLM → Custom Function` nativamente. A API de invocação é a mesma (`POST /api/v1/prediction/<id>`), então nada muda na aplicação.
+
+1. Conta em [flowiseai.com](https://flowiseai.com) (free tier) → no menu lateral, **Agentflows** → botão **Add New** → escolha **V2** (se a instância listar V1 e V2, use o V2)
+2. **Credencial**: canto superior esquerdo, ícone de chave (**Credentials**) → **Add Credential** → busque *ChatOpenRouter* → nome `OpenRouter` → cole a **API Key do OpenRouter** (crie em [openrouter.ai/keys](https://openrouter.ai/keys)). A credencial fica no cofre do Flowise, não no repositório — o Flowise Cloud não tem integração nativa com o gateway OpenCode, por isso o fluxo usa OpenRouter
+3. Canvas: o node **Start** já vem criado. Clique no **+** (ícone à direita do node Start, ou botão **Add Nodes**) → categoria **Agent Flows** → node **LLM**. Conecte a saída do **Start** na entrada do **LLM** (se não conectar sozinho, arraste do ponto à direita do Start até o ponto à esquerda do LLM)
+4. Configure o node **LLM**:
+   - **Model**: clique no campo, busque e selecione **ChatOpenRouter** → **Connect Credential** = `OpenRouter`
+   - **Model Name**: slug exato de um modelo free copiado de [openrouter.ai/models](https://openrouter.ai/models) (ex.: `moonshotai/kimi-k2:free`)
+   - **Temperature**: `0.2`
+   - **System Message**:
 
 ```text
 Você é o assistente SRE do SmartOrder AI, agente de recomendações B2B.
@@ -49,23 +55,28 @@ AÇÃO RECOMENDADA: <uma frase>
 Responda SOMENTE com esse bloco. Se o JSON for inválido, use SEVERIDADE: baixa e descreva o conteúdo recebido.
 ```
 
-   - Prompt = `{input}` (Human) → conecte no ChatOpenAI
-5. Adicione o node **Custom Function** (Utility) conectado ao ChatOpenAI e declare a variável em **Variables** (API Keys → Variables): `DISCORD_WEBHOOK_URL` = URL do passo 1 (tipo *String/Secret*)
+   - **Human Message**: deixe o valor padrão — o payload enviado pela aplicação (campo `question`) entra automaticamente como mensagem do usuário no LLM
+5. **Variável do webhook**: volte ao **Dashboard** (fora do agentflow) → **Variables** → **Add Variable** → Name `DISCORD_WEBHOOK_URL` · Type `String` · Value = URL do passo 1 → **Save**. Depois volte ao canvas do agentflow e recarregue a página (F5) para o `$vars` ficar disponível no node (não use o node "Set Variable" para isso)
+6. Add node **Custom Function** (categoria **Agent Flows** — não o "Custom JS Function" de Chatflows/Utilities) → conecte a saída do **LLM** na entrada dele → **Function Name**: `sendDiscordAlert` (sem espaços) → cole no campo **Javascript Function**:
 
 ```javascript
-const webhook = $vars.DISCORD_WEBHOOK_URL;
-const res = await fetch(webhook, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ content: "🚨 **SmartOrder AI — Alerta Operacional**\n" + $input }),
+const axios = require('axios');
+const res = await axios.post($vars.DISCORD_WEBHOOK_URL, {
+  content: "🚨 **SmartOrder AI — Alerta Operacional**\n" + $input
 });
 return "Alerta enviado ao Discord (HTTP " + res.status + ")";
 ```
 
-   > Se sua versão do Flowise exigir assinatura de função, envolva o código em `async function main() { ... return ... }`.
-6. **Save** → teste no chat do próprio Flowise colando: `{"event":"security_blocked","request_id":"teste","customer_id":100011,"reason":"injection","risk_level":"high"}` → a mensagem deve aparecer no Discord
-7. **Exportar**: menu do chatflow → **Export Chatflow** → salve como `docs/lowcode/flowise-flow.json` (versionado no repo)
-8. Copie o **Chatflow ID** (final da URL do chatflow) e gere a **API Key** (Dashboards → API Keys)
+   > `$input` = saída do node anterior (o alerta classificado pelo LLM). O Discord responde `HTTP 204` (sem conteúdo) em caso de sucesso.
+7. **Save** (botão no canto superior direito) → teste no chat do próprio Flowise (ícone de balão, canto superior direito) colando:
+
+```json
+{"event":"security_blocked","request_id":"teste","customer_id":100011,"reason":"injection","risk_level":"high"}
+```
+
+   → a mensagem deve aparecer no Discord com o bloco `SEVERIDADE/EVENTO/CAUSA PROVÁVEL/AÇÃO RECOMENDADA`. Se falhar, verifique os logs de execução do agentflow (ícone de execuções/Logs) para identificar o node do erro
+8. **Exportar**: menu **⋯** do agentflow (canto superior direito) → **Export Chatflow** (o Flowise exporta agentflow como JSON no mesmo formato) → salve como `docs/lowcode/flowise-flow.json` (versionado no repo)
+9. Copie o **ID do agentflow** (final da URL, ex. `.../agentflows/<id>`) e gere a **API Key** (Dashboard → **API Keys** → **Create API Key**)
 
 ## Passo 3 — Conectar a aplicação
 
@@ -75,7 +86,7 @@ return "Alerta enviado ao Discord (HTTP " + res.status + ")";
 FLOWISE_ALERTS_ENABLED=true
 FLOWISE_URL=https://<sua-org>.flowiseai.com
 FLOWISE_API_KEY=<api-key do flowise>
-FLOWISE_CHATFLOW_ID=<chatflow-id>
+FLOWISE_CHATFLOW_ID=<id do agentflow>
 ```
 
 ## Passo 4 — Demonstração end-to-end
@@ -92,4 +103,9 @@ curl -X POST http://localhost:8000/recomendacoes -H "Content-Type: application/j
 
 - `FLOWISE_ALERTS_ENABLED=false` (padrão): **nenhuma** chamada externa
 - Chamada best-effort com timeout de 5 s: falha do Flowise **não** afeta a resposta da API (coberta por teste `test_erro_no_flowise_nao_quebra_a_resposta`)
-- Segredos: key do OpenCode no cofre do Flowise; webhook do Discord em variável do Flowise; apenas URL/ID/key do Flowise no `.env` local
+- Segredos: key do OpenRouter no cofre do Flowise; webhook do Discord em variável do Flowise; apenas URL/ID/key do Flowise no `.env` local
+
+## Correções
+
+- **30/08**: o Flowise Cloud não tem integração nativa com o gateway OpenCode → credencial e node do chatflow alterados para **ChatOpenRouter** (modelo free via OpenRouter); variável do webhook criada em Dashboard → Variables (sem o node "Set Variable"); placeholder do Human Message fixado em `{input}`; Function Name sem espaços.
+- **31/08**: o node *Custom JS Function* de Chatflow (v3.x) não aceita conexão de Chat Model (única entrada é o anchor "Input Variables", tipado como JSON — a conexão do ChatOpenRouter falhava com erro de JSON) → fluxo reconstruído como **Agentflow V2** (`Start → LLM → Custom Function`, sem node de ChatPrompt); passo 2 reescrito com roteiro detalhado; código do Discord migrado para `require('axios')` (dependência garantida no agentflow); var `.env` `FLOWISE_CHATFLOW_ID` mantida (mesmo endpoint da Prediction API).
