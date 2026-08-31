@@ -46,6 +46,7 @@ Esta pasta concentra **artefatos comprobatórios de execução** do projeto, con
 | 29/08 | Pipeline 3/3 etapas com análise da IA de cada estágio | 7 | [`pipeline/pipeline-local-2026-08-29.md`](./pipeline/pipeline-local-2026-08-29.md) |
 | 29/08 | Anomalia linear de latência da tool (detecção run 5, causa isolada) | 7 | [`anomalias/anomalia-tool-latency-2026-08-29.md`](./anomalias/anomalia-tool-latency-2026-08-29.md) |
 | 29/08 | Estimativa de tendência (regressão) e risco de falha (SLA) | 7 | [`metricas/tendencia-risco-2026-08-29.md`](./metricas/tendencia-risco-2026-08-29.md) |
+| 31/08 | E2E Flowise + Discord (Parte 8) — injection → `flowise_notify` → Agentflow V2 (`poolside/laguna-s-2.1`) → webhook Discord HTTP 204, todos os sinais correlacionados por `request_id` | 8 | [`execucoes/flowise-discord-e2e-fase-8.md`](./execucoes/flowise-discord-e2e-fase-8.md) |
 
 ---
 

@@ -5,51 +5,42 @@
 
 ---
 
-## ⏰ Ao retornar (30/08) — executar nesta ordem
+## ⏰ Ao retornar (31/08) — executar nesta ordem
 
-1. **PARTE 8 (fechar):**
-   - a. Discord webhook (2 min) → [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md) passo 1
-   - b. Agentflow V2 no Flowise Cloud (10 min) → passos 2.1–2.9 do mesmo doc
-   - c. Exportar o agentflow como `docs/lowcode/flowise-flow.json`
-   - d. Passar para o assistente: `FLOWISE_URL`, `FLOWISE_API_KEY`, `FLOWISE_CHATFLOW_ID` (= ID do agentflow) → `.env` + **demo end-to-end real** (injection → Discord) → evidência arquivada
-   - e. `fase-8-lowcode.md` + Parte 8 ✅ no plano-execucao + critério 14 + Kanban
-2. **PARTE 9 (finalização, entregar até 15h):**
-   - a. Prompts consolidados + refinamento (critério 15)
+1. **PARTE 9 (finalização, entregar até 15h):**
+   - a. Consolidar prompts + refinamentos em `docs/prompts/` (critério 15)
    - b. README final (checklist 5.2) + link do vídeo
    - c. Gravar vídeo ≤12min (roteiro 5.5) → YouTube não listado → AVA
    - d. Merge `develop` → `main` + convidar professor + submeter no AVA
-3. **NÃO ESQUECER:** revogar a API key OpenCode **após** a entrega (exposta no chat) · secret `LLM_API_KEY` no Actions (opcional) · Kanban em dia
+2. **NÃO ESQUECER (segurança):** revogar/rotacionar **após** a entrega:
+   - **API key OpenCode** (exposta no chat — `LLM_API_KEY`)
+   - **API key do Flowise** (se gerada — endpoint deste projeto respondeu 200 sem auth; var vazia no `.env`)
+   - **Webhook do Discord** (a URL circulou no chat)
+   - secret `LLM_API_KEY` no GitHub Actions (opcional, para smoke no CI) · Kanban em dia
 
 ---
 
-## 📍 Onde paramos (29/08 — fim da Parte 8, lado da aplicação)
+## 📍 Onde paramos (31/08 — Parte 8 concluída, Parte 9 aberta)
 
-- ✅ **Parte 8 (app-side) mergeada** — `0dc052c` · **47 passed** · Ruff limpo
-- ✅ Integração Flowise pronta e testada (best-effort, env-gated, não quebra a API)
-- ⏸️ **BLOQUEIO — aguardando ação do usuário** (fluxo visual no Flowise + Discord, roteiro pronto em [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md))
-- 🆕 **30/08**: Flowise Cloud não tem integração OpenCode → chatflow com **OpenRouter** (modelo free); passo 2 do doc atualizado
-- 🆕 **31/08**: Custom JS Function de chatflow não aceita Chat Model (erro de JSON ao conectar) → fluxo reconstruído como **Agentflow V2** (Start → LLM → Custom Function); passo 2 do doc reescrito com roteiro detalhado
+- ✅ **Parte 8 concluída**: Agentflow V2 no Flowise Cloud montado com `poolside/laguna-s-2.1` (OpenRouter free) — request_id `3bfceacea49f` na demo E2E real (10,1 s, Discord HTTP 204)
+- ✅ Evidência + 2 screenshots + JSON do agentflow versionados
+- ✅ `fase-8-lowcode.md` + plano-execucao (Parte 8 ✅, critério 14 ✅) + docs atualizados
+- ▶️ **Foco agora**: Parte 9 — finalizar README, vídeo ≤12min, merge `develop→main`, AVA até **15h**
 
 ---
 
-## [0.8.0] — Parte 8: Flowise Low-Code — **EM ANDAMENTO**
+## [0.8.0] — Parte 8: Flowise Low-Code — ✅
 
 ### Feito
-- `app/integrations/flowise.py`: `notify_flowise()` via httpx — timeout 5s, chamada best-effort (exceção engolida, resposta da API preservada), ativado por `FLOWISE_ALERTS_ENABLED=true`
-- Emissão de eventos em `run_recommendation`: `security_blocked` (risco `high` p/ injection, `medium` p/ autonomia) e `recommendation_generation_failed` (fallback do LLM)
-- 5 testes novos com HTTP mockado (habilitado/desabilitado/erro engolido/payload correto)
-- Passo a passo completo de reprodução: `docs/lowcode/reproducao-flowise.md`
-- Decisão registrada: N8N trial expirou → **Flowise** (aprovação do professor; melhor fit com "construção visual de agentes")
-- Decisão 30/08: Flowise Cloud não possui integração OpenCode → credencial/node **ChatOpenRouter** (modelo free via OpenRouter); `reproducao-flowise.md` passo 2 atualizado
-- Decisão 31/08: chatflow → **Agentflow V2** (o Custom JS Function de chatflow não aceita Chat Model; o V2 é o editor visual de agentes do Flowise, mesma Prediction API); passo 2 reescrito
-
-### Falta para concluir a Parte 8 (ação do usuário)
-- [ ] Criar webhook do Discord ✅ (30/08)
-- [ ] Montar o **Agentflow V2** no Flowise Cloud (Start → LLM ChatOpenRouter modelo free + prompt SRE → Custom Function → Discord) — roteiro exato no doc
-- [ ] Exportar o agentflow como `docs/lowcode/flowise-flow.json` (versionar)
-- [ ] Passar URL/API key/Agentflow ID → configurar `.env` local
-- [ ] Evidência end-to-end real (injection → alerta no Discord) arquivada em `docs/evidencias/`
-- [ ] `fase-8-lowcode.md` + Parte 8 ✅ no plano-execucao + critério 14 marcado
+- **App-side** (mergeada em `0dc052c`): `app/integrations/flowise.py` com `notify_flowise()` via httpx — chamada **best-effort** (timeout `flowise_timeout_s`, exceção engolida, resposta da API preservada), ativada por `FLOWISE_ALERTS_ENABLED=true`
+- Eventos emitidos em `run_recommendation`: `security_blocked` (risco `high` p/ injection, `medium` p/ autonomia) e `recommendation_generation_failed` (fallback do LLM)
+- 5 testes novos com HTTP mockado (`tests/test_flowise.py`) — habilitação, payload, erro engolido, auth opcional
+- **Fluxo low-code (Agentflow V2)** no Flowise Cloud: `Start → LLM (poolside/laguna-s-2.1 via OpenRouter, temp 0,2) → Custom Function` (axios → webhook Discord); prompt SRE no System Message; webhook em variável `DISCORD_WEBHOOK_URL` (Dashboard → Variables, **não** via node Set Variable)
+- Export JSON **sem segredos** versionado em [`docs/lowcode/flowise-flow.json`](docs/lowcode/flowise-flow.json) (3 nodes, 2 edges; grep `discord.com/api/webhooks/[0-9]`, `sk-or`, `Bearer`: 0 matches)
+- **Demo E2E real** (request_id `3bfceacea49f`): injection → `security_check` (0,1 ms) → `flowise_notify` (6,7 s, Flowise HTTP 200) → Agentflow classifica `SEVERIDADE: alta / CAUSA PROVÁVEL: ... / AÇÃO RECOMENDADA: ...` → Discord HTTP 204. Total 10,1 s · três sinais correlacionados (logs/audit/metrics)
+- Documentação: passo 2 de [`docs/lowcode/reproducao-flowise.md`](docs/lowcode/reproducao-flowise.md) reescrito com roteiro item-a-item (usuário não conhecia Flowise); evidência em [`docs/evidencias/execucoes/flowise-discord-e2e-fase-8.md`](docs/evidencias/execucoes/flowise-discord-e2e-fase-8.md); screenshots em `docs/evidencias/screenshots/`
+- Decisões: N8N trial expirou → **Flowise** (aprovação do professor) → **OpenRouter** (sem integração OpenCode no Flowise Cloud) → **Agentflow V2** (Custom JS Function de Chatflow não aceita Chat Model — erro de JSON ao conectar)
+- `fase-8-lowcode.md` criado com prompts, resultado, lições e evidências
 
 ---
 
@@ -113,8 +104,6 @@
 
 ## 🗺️ Roadmap restante
 
-### Concluir Parte 8 (ver pendências acima — usuário + evidência)
-
 ### Parte 9 — Finalização (31/08 até 15h)
 - [ ] Consolidar prompts + refinamentos em `docs/prompts/` (critério 15)
 - [ ] README final — checklist completo da seção 5.2 do brief
@@ -125,8 +114,10 @@
 - [ ] Convidar professor como colaborador (se ainda não feito)
 - [ ] Configurar secret `LLM_API_KEY` no GitHub Actions (opcional, para smoke no CI)
 
-### Pós-entrega (obrigatório)
-- [ ] **Revogar/trocar a API key OpenCode** (exposta na conversa) — critério 10
+### Pós-entrega (obrigatório — segurança)
+- [ ] **Revogar/trocar a API key OpenCode** (`LLM_API_KEY`, exposta na conversa)
+- [ ] **Rotacionar o webhook do Discord** (URL circulou no chat)
+- [ ] **Rotacionar/limpar API key do Flowise** (se foi gerada; este projeto não usou — var vazia no `.env`)
 
 ---
 

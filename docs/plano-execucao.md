@@ -42,8 +42,8 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 5 | **Observabilidade** | Logs JSON por node (`logs/execution.log`), métricas agregadas + `GET /metrics`, audit JSONL correlacionado por `request_id`, timeout/retry no LLM, delay simulável na tool | 11 | ✅ **Concluída** | pytest 41 passed · evidência `observabilidade-fase-5.md` (3 execuções, 3 sinais correlacionados) · branch `feature/observabilidade` | Bug de chaves não declaradas no State corrigido; LLM confirmado como gargalo (98,8%) |
 | 6 | **QA** | Code review com IA de diff real (commit `07fbd7f`: 4 achados, 1 correção), cobertura 95% arquivada, priorização por risco (matriz 6 cenários), testes unit+integração+E2E consolidados | 12 | ✅ **Concluída** | pytest 42 passed · `docs/qa/` populada (review + relatório + matriz) · branch `feature/qa-inteligente` | Achado A1: falhas de invocação agora contam nas métricas |
 | 7 | **DevOps** | CI GitHub Actions (ruff→pytest+cobertura→wheel, secret LLM_API_KEY), IA analisa 3 estágios do pipeline, anomalia linear detectada na run 5 de série de 8, regressão + projeção de SLA | 13 | ✅ **Concluída** | pipeline 3/3 local · `evidencias/pipeline/`, `anomalias/`, `metricas/` · branch `feature/devops-anomalias` | Risco ALTO: SLA 2s violado em ~3 runs se tendência continuar |
-| 8 | **Flowise Low-code** | `app/integrations/flowise.py` (webhook best-effort nos eventos `security_blocked`/`recommendation_generation_failed`) → **Agentflow V2** no Flowise Cloud (Start → LLM ChatOpenRouter modelo free + prompt SRE → Custom Function) → alerta no Discord + resposta registrada; export JSON do fluxo versionado | 14 | 🔄 Em andamento (app-side ✅ mergeada `0dc052c`) | — | **Decisão 29/08**: N8N trial expirou; professor aprovou Flowise. **Decisão 30/08**: Flowise sem integração OpenCode → OpenRouter no fluxo. **Decisão 31/08**: Custom JS Function de chatflow não aceita Chat Model → reconstruído como Agentflow V2. Requer: agentflow + webhook Discord (webhook ✅) |
-| 9 | **Finalização** | `docs/prompts/system.md` + ciclo de refinamento, README completo (seção 5.2), evidências, vídeo (roteiro 5.5), merge `develop→main`, submissão AVA | 1, 4, 15 | ⬜ Pendente | — | **Revogar API key após a entrega** |
+| 8 | **Flowise Low-code** | `app/integrations/flowise.py` (webhook best-effort nos eventos `security_blocked`/`recommendation_generation_failed`) → **Agentflow V2** no Flowise Cloud (Start → LLM ChatOpenRouter modelo free + prompt SRE → Custom Function) → alerta no Discord + resposta registrada; export JSON do fluxo versionado | 14 | ✅ **Concluída** | commit `43ec8da` (doc) + parte 8 final · `flowise-flow.json` (3 nodes, sem segredos) · evidência `flowise-discord-e2e-fase-8.md` (request_id `3bfceacea49f`) · screenshots `flowise-1-...` (erro) e `flowise-2-...` (ok) | **Decisão 29/08**: N8N trial expirou; professor aprovou Flowise. **Decisão 30/08**: Flowise sem integração OpenCode → OpenRouter no fluxo. **Decisão 31/08**: Custom JS Function de chatflow não aceita Chat Model → reconstruído como Agentflow V2. Modelo real: `poolside/laguna-s-2.1` (OpenRouter free); `flowise_timeout_s=45` para modelos reasoning |
+| 9 | **Finalização** | `docs/prompts/system.md` + ciclo de refinamento, README completo (seção 5.2), evidências, vídeo (roteiro 5.5), merge `develop→main`, submissão AVA | 1, 4, 15 | ⬜ Pendente | — | **Revogar/rotacionar após a entrega**: LLM key, Flowise API key (se usada), webhook Discord — todos circularam no chat durante o desenvolvimento |
 
 ---
 
@@ -64,7 +64,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 11 | 2 sinais de observabilidade + timeout/retry/fallback | 5 | Logs JSON + métricas `/metrics` + audit JSONL ✅ |
 | 12 | IA em code review + testes (integração/aceitação/E2E) + priorização por risco | 6 | `docs/qa/` (review, cobertura 95%, matriz de risco) ✅ |
 | 13 | Pipeline + IA analisa logs + anomalia + estimativa de risco | 7 | CI yml + pipeline/evidências + regressão/projeção ✅ |
-| 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo Flowise (export JSON) + evidência end-to-end |
+| 14 | Low-code integrado com trigger e saída observável | 8 | Fluxo Flowise (export JSON) + evidência end-to-end ✅ |
 | 15 | Refinamento documentado (problema→alteração→resultado) | 9 | `docs/prompts/refinamentos/` |
 
 ---
@@ -73,7 +73,8 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 
 ### Pendências do usuário (não bloqueiam o código)
 - [ ] **Convidar o professor como colaborador** no repo (checklist do brief)
-- [x] ~~Criar conta N8N Cloud~~ → **Decisão 29/08**: N8N Cloud expirou o trial; professor aprovou **Flowise** como alternativa (e melhor fit com o critério: construção visual de agentes). Pendências atuais: conta Flowise Cloud (free tier) + webhook Discord
+- [x] ~~Criar conta N8N Cloud~~ → **Decisão 29/08**: N8N Cloud expirou o trial; professor aprovou **Flowise** como alternativa (e melhor fit com o critério: construção visual de agentes)
+- [x] ~~Webhook do Discord~~ (31/08) + ~~Agentflow V2 no Flowise Cloud~~ (31/08, `poolside/laguna-s-2.1`)
 - [ ] Manter o **Kanban atualizado** a cada parte (cards prontos na conversa; mover "Fluxo LangGraph" para Em Andamento agora)
 - [ ] Gravar o vídeo (roteiro 5.5: 0-1 problema, 1-2 arquitetura, 2-4 cenários, 4-5 segurança, 5-6 QA, 6-8 pipeline/anomalia/risco, 8-9 low-code Flowise, 9-10 limitações)
 
@@ -84,7 +85,7 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | `hy3-free` é modelo de reasoning (consome tokens pensando; `content` ok) | `max_tokens` folgado (800+), temperatura 0.2, validação determinística do JSON |
 | Quota/instabilidade do modelo gratuito | Retry limitado + fallback: recomendações por coocorrência pura |
 | Prazo curto (2,5 dias) | Cortes permitidos: interface visual, Docker. **Nenhum critério do brief é cortável** |
-| Credencial exposta = nota zero | `.env` gitignored desde o início; **revogar a key após 31/08** |
+| Credencial exposta = nota zero | `.env` gitignored desde o início; **revogar a LLM key + Flowise API key (se houver) + rotacionar o webhook do Discord após 31/08** |
 
 ### Regras de processo permanentes
 1. **Prompts por fase**: toda Parte N gera `docs/prompts/desenvolvimento/fase-N-<nome>.md` **antes** da Parte N+1
@@ -119,3 +120,4 @@ relacionado: [./README.md](./README.md) | [./prompts/desenvolvimento/](./prompts
 | 29/08 | Decisão de low-code: N8N Cloud expirou → **Flowise** (aprovação do professor, melhor fit com construção visual de agentes); plano da Parte 8 atualizado (Flowise Cloud + Discord + hy3-free) |
 | 30/08 | Chatflow low-code: Flowise Cloud sem integração OpenCode → credencial/node **ChatOpenRouter** (modelo free via OpenRouter); passo 2 de `reproducao-flowise.md` atualizado |
 | 31/08 | Webhook do Discord criado; fluxo migrado de Chatflow para **Agentflow V2** (o Custom JS Function de chatflow não aceita conexão de Chat Model — erro de JSON); passo 2 de `reproducao-flowise.md` reescrito com roteiro detalhado |
+| 31/08 | **Parte 8 concluída**: Agentflow V2 montado com `poolside/laguna-s-2.1` via OpenRouter; demo E2E real (`request_id 3bfceacea49f`, latência total 10,1 s, Discord HTTP 204) — evidência + 2 screenshots + JSON exportado versionados; `fase-8-lowcode.md` criado; critério 14 ✅ |
