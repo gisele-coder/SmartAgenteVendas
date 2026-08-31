@@ -5,27 +5,79 @@
 
 ---
 
-## ⏰ Ao retornar (31/08) — executar nesta ordem
+## 📦 Estado de Entrega (31/08)
 
-1. **PARTE 9 (finalização, entregar até 15h):**
-   - a. Consolidar prompts + refinamentos em `docs/prompts/` (critério 15)
-   - b. README final (checklist 5.2) + link do vídeo
-   - c. Gravar vídeo ≤12min (roteiro 5.5) → YouTube não listado → AVA
-   - d. Merge `develop` → `main` + convidar professor + submeter no AVA
-2. **NÃO ESQUECER (segurança):** revogar/rotacionar **após** a entrega:
-   - **API key OpenCode** (exposta no chat — `LLM_API_KEY`)
-   - **API key do Flowise** (se gerada — endpoint deste projeto respondeu 200 sem auth; var vazia no `.env`)
-   - **Webhook do Discord** (a URL circulou no chat)
-   - secret `LLM_API_KEY` no GitHub Actions (opcional, para smoke no CI) · Kanban em dia
+> Snapshot vivo do que está pronto para a entrega acadêmica (15h) e o que falta fazer.
 
----
+### ✅ Pronto — já no `origin/develop` (commit `2b24511` mais o roteiro `00be4b3`)
 
-## 📍 Onde paramos (31/08 — Parte 8 concluída, Parte 9 aberta)
+**Partes 0–8** (todas concluídas, commitadas e pushadas na `develop`):
 
-- ✅ **Parte 8 concluída**: Agentflow V2 no Flowise Cloud montado com `poolside/laguna-s-2.1` (OpenRouter free) — request_id `3bfceacea49f` na demo E2E real (10,1 s, Discord HTTP 204)
-- ✅ Evidência + 2 screenshots + JSON do agentflow versionados
-- ✅ `fase-8-lowcode.md` + plano-execucao (Parte 8 ✅, critério 14 ✅) + docs atualizados
-- ▶️ **Foco agora**: Parte 9 — finalizar README, vídeo ≤12min, merge `develop→main`, AVA até **15h**
+- [x] **Parte 0** — Fundação (`58d76b5`) · scaffold, `.gitignore`, LLM por env
+- [x] **Parte 1** — Dados + Tools (`a999dbc`) · `get_customer_orders` + coocorrência
+- [x] **Parte 2** — Núcleo LangGraph (`b76db1d`) · 8 nodes, paralelização, DAG
+- [x] **Parte 3** — API + Memória (`24ff625`) · FastAPI + `MemorySaver`
+- [x] **Parte 4** — Segurança (`2c3396d`) · injection + autonomia + audit JSONL
+- [x] **Parte 5** — Observabilidade (`448e233`) · logs + `/metrics` + audit correlacionado
+- [x] **Parte 6** — QA com IA (`f5e9001`) · code review + cobertura 95% + matriz de risco
+- [x] **Parte 7** — DevOps (`0f4fb80`) · CI 3/3 + anomalia + risco ALTO (SLA 2s)
+- [x] **Parte 8** — Flowise Low-Code (`0dc052c` app + `87960dc` evidence) · Agentflow V2 → Discord (request_id `3bfceacea49f`, HTTP 204)
+
+**Parte 9 — já prontos (esperando apenas o link do vídeo):**
+
+- [x] README final (checklist 5.2 do brief) — commit `f134187`
+- [x] Refinamento 3 (Chatflow → Agentflow V2) — commit `c258120` (critério 15)
+- [x] Feature extra: **recomendação por carrinho** (`seed_products`) — commit `2b24511` (11 testes novos, 57 passed, 0 regressões)
+- [x] Roteiro detalhado do vídeo de demonstração — commit `00be4b3` ([`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md))
+- [x] Critérios do brief atendidos — 15/15 (rastreabilidade em [`docs/plano-execucao.md`](docs/plano-execucao.md) § 3)
+- [x] Segurança: `.env` gitignored · credencial **nunca** commitada (validado por grep nos 3 commits da Parte 8/9)
+
+**Qualidade atual:**
+- Ruff limpo
+- **57 testes passados** (46 anteriores + 11 do carrinho)
+- 1 falha pré-existente em `test_llm_smoke` (gateway OpenCode não suporta mais `hy3-free` — fora do escopo deste commit; documentado)
+- Branch `develop` 6 commits à frente da `main`; `main` intacta (1 commit original `0cabd3c`)
+
+### ⬜ Falta para fechar a entrega — ordem sugerida
+
+1. [ ] **Gravar o vídeo** ≤ 12 min seguindo [`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md)
+   - [ ] Upload no YouTube como **não listado**
+   - [ ] Copiar o link e atualizar `README.md` seção 13 (substituir o placeholder 🚧 pelo link)
+2. [ ] **Commit do link** `docs: adiciona link do vídeo de demonstração` → push na `develop`
+3. [ ] **Merge** `develop` → `main` (PR pode ser local — `git checkout main && git merge --no-ff develop`)
+4. [ ] **Convidar o professor como colaborador** no GitHub (Settings → Collaborators)
+5. [ ] **Submeter no AVA** (Projeto Avaliativo – M2.2):
+   - Link do repositório (`https://github.com/gisele-coder/SmartAgenteVendas`)
+   - Link do quadro Kanban
+   - Link do vídeo (YouTube não listado)
+6. [ ] **Atualizar o Kanban** (mover cards 8 e 9 para "Concluído")
+7. [ ] **Não alterar o repositório após 15h** (regra do brief § 7)
+
+### 🛑 Pós-entrega — segurança (obrigatório)
+
+- [ ] **Revogar/rotacionar a API key OpenCode** (`LLM_API_KEY`, exposta no chat)
+- [ ] **Rotacionar o webhook do Discord** (a URL circulou no chat)
+- [ ] **Rotacionar/limpar a API key do Flowise** (este projeto não usou — var vazia no `.env`, mas vale verificar no Dashboard → API Keys)
+
+### 📊 Resumo de critérios do brief
+
+| Critério | Status | Artefato |
+|---|---|---|
+| 1 — Vídeo ≤12 min, YouTube não listado | ⬜ pendente | roteiro pronto; gravar e subir |
+| 2 — Cards no quadro com descrições | ✅ | Kanban |
+| 3 — Quadro atualizado durante o desenvolvimento | ✅ | histórico |
+| 4 — Branches, commits semânticos, develop→feature→main | ✅ | 9+ feature branches; commits descritivos |
+| 5 — README completo e reproduzível | ✅ | `README.md` (seção 5.2) |
+| 6 — App funcional, 2 cenários, saída estruturada | ✅ | API + JSON Pydantic |
+| 7 — LangGraph: state, nodes, sequencial+condicional+paralelo, parada | ✅ | `app/graph/` 8 nodes, DAG |
+| 8 — Tool integrada com validação e tratamento de falhas | ✅ | `app/tools/` |
+| 9 — Memória/contexto adequada | ✅ | `MemorySaver` + histórico via tool |
+| 10 — Segurança, autonomia, cenário adversarial | ✅ | `app/security/` + evidência |
+| 11 — 2 sinais de observabilidade + timeout/retry/fallback | ✅ | logs + `/metrics` + audit JSONL |
+| 12 — IA em code review + testes (integração/aceitação/E2E) + risco | ✅ | `docs/qa/` |
+| 13 — Pipeline + IA + anomalia + estimativa de risco | ✅ | CI + evidências + projeção |
+| 14 — Low-code integrado com trigger e saída observável | ✅ | Flowise Agentflow V2 + Discord |
+| 15 — Refinamento documentado (problema→alteração→resultado) | ✅ | 3 ciclos em `docs/prompts/refinamentos/` |
 
 ---
 
@@ -102,22 +154,40 @@
 
 ---
 
-## 🗺️ Roadmap restante
+## 🗺️ Próximos passos (resumo)
 
-### Parte 9 — Finalização (31/08 até 15h)
-- [ ] Consolidar prompts + refinamentos em `docs/prompts/` (critério 15)
-- [ ] README final — checklist completo da seção 5.2 do brief
-- [ ] **Vídeo ≤12min** (roteiro 5.5) → YouTube não listado → link no README
-- [ ] Atualizar Kanban (cards 8 e 9)
-- [ ] **Merge `develop` → `main`** (código final funcional na main)
-- [ ] Submissão no AVA: repo + quadro + vídeo
-- [ ] Convidar professor como colaborador (se ainda não feito)
-- [ ] Configurar secret `LLM_API_KEY` no GitHub Actions (opcional, para smoke no CI)
+> Ver a seção **📦 Estado de Entrega** acima para o checklist detalhado (do ✅ pronto ao ⬜ pendente).
 
-### Pós-entrega (obrigatório — segurança)
-- [ ] **Revogar/trocar a API key OpenCode** (`LLM_API_KEY`, exposta na conversa)
-- [ ] **Rotacionar o webhook do Discord** (URL circulou no chat)
-- [ ] **Rotacionar/limpar API key do Flowise** (se foi gerada; este projeto não usou — var vazia no `.env`)
+**Curto prazo (antes das 15h):** gravar o vídeo a partir do roteiro pronto → atualizar README com o link → commit → merge `develop → main` → AVA.
+
+**Pós-entrega:** revogar `LLM_API_KEY`, rotacionar o webhook do Discord e (se houver) a API key do Flowise.
+
+---
+
+## [0.9.0] — 31/08 — Finalização / Entrega (Parte 9) — ⏳ em curso
+
+### Feito
+- **README final** (commit `f134187`) — atende integralmente a seção 5.2 do brief: descrição/classificação/arquitetura, tool, memória, segurança, 7 cenários (incluindo carrinho), QA/observabilidade/DevOps, low-code Flowise, instalação, testes, 3 refinamentos linkados + limitações, links para toda a documentação, placeholder do vídeo
+- **Refinamento 3** (commit `c258120`) — Chatflow → Agentflow V2 (erro de JSON ao conectar) documentado em [`docs/prompts/refinamentos/refinamento-3-chatflow-para-agentflow-v2.md`](docs/prompts/refinamentos/refinamento-3-chatflow-para-agentflow-v2.md) — atende critério 15
+- **Feature extra: recomendação por carrinho** (commit `2b24511`) — `seed_products: list[int]` no request, coocorrência market-basket com base no carrinho, 11 testes novos, 0 regressões
+- **Roteiro detalhado do vídeo** (commit `00be4b3`) — [`docs/video/roteiro-video-fase-9.md`](docs/video/roteiro-video-fase-9.md) com timestamps, falas, comandos `curl` prontos e checklist pré-gravação
+- Documentação consolidada: README, CHANGELOG, plano-execucao, prompts (9 fases + 3 refinamentos) — todos sincronizados
+
+### Pendente (ordem)
+- [ ] Gravar vídeo (≤ 12 min) seguindo o roteiro
+- [ ] Upload no YouTube como não listado
+- [ ] Substituir o placeholder 🚧 na seção 13 do README pelo link
+- [ ] Commit do link + push na `develop`
+- [ ] **Merge `develop` → `main`** (manter `main` como versão final funcional)
+- [ ] Convidar professor como colaborador
+- [ ] Submeter links (repo + quadro + vídeo) no AVA — **antes das 15h**
+- [ ] Atualizar Kanban (cards 8 e 9 → Concluído)
+- [ ] Não alterar o repositório após o prazo (brief § 7)
+
+### Pós-entrega (segurança)
+- [ ] Revogar `LLM_API_KEY` OpenCode (exposta no chat)
+- [ ] Rotacionar webhook do Discord
+- [ ] Rotacionar/limpar API key do Flowise (se gerada)
 
 ---
 
